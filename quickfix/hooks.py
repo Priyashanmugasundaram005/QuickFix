@@ -228,6 +228,13 @@ app_license = "mit"
 # 	}
 # ]
 
+fixtures=[
+    {
+    'dt':'Device Type',
+    filter:['name', 'in', ['Smartphone','Laptop','Tablet']]
+    }
+]
+
 # Authentication and authorization
 # --------------------------------
 

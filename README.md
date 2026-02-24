@@ -216,6 +216,35 @@ Occurs when:
 * Ensure updates roll back automatically if the main document fails.
 
 
+# Child Table Internals
+
+## Auto-set Columns on Child Rows
+When a row is added to `Job Card.parts_used` and saved, Frappe automatically sets:
+
+- **parent** – Parent document name (Job Card ID)
+- **parenttype** – Parent DocType ("Job Card")
+- **parentfield** – Child table fieldname ("parts_used")
+- **idx** – Row order in the table
+
+---
+
+## Child Table DB Name
+The database table for **Part Usage Entry** DocType is:
+
+tabPart Usage Entry
+
+Frappe adds the `tab` prefix to all DocType tables.
+
+---
+
+## idx Behavior After Deletion
+If the row at `idx = 2` is deleted and the document is saved:
+
+- Remaining rows are automatically reordered.
+- `idx` values are reset sequentially starting from 1.
+- No gaps are left in row numbering.
+
+
 
  
 

@@ -96,7 +96,8 @@ mit
   - This helps developers debug issues quickly.
 
 - **developer_mode: 0**
-  - The browser receives a generic error message (e.g., "Internal Server Error").
+  - If the bench is in local then full traceback will take place as same as developer_mode:1
+  - When the bench is in procudtion the browser receives a generic error message (e.g., "Internal Server Error").
   - Detailed traceback is hidden to prevent exposing sensitive information.
   - This is important for production to protect system details and security.
 
@@ -243,6 +244,38 @@ If the row at `idx = 2` is deleted and the document is saved:
 - Remaining rows are automatically reordered.
 - `idx` values are reset sequentially starting from 1.
 - No gaps are left in row numbering.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Rename & Unique Constraints
+
+## Rename Document
+- After renaming a Technician, linked Job Cards **auto-update** the `assigned_technician` field.
+- Frappe updates all Link fields to maintain referential integrity.
+- Link fields store the document name (primary key), so references stay valid.
+
+## Track Changes
+- Records field-level changes in the Version log.
+- Shows old value, new value, user, and timestamp.
+- It does **not control link updates**.
+
+## Unique Constraints
+
+**Unique field in DocType**
+- Enforced at database level.
+- Prevents duplicates automatically.
+- Reliable and fast.
+
+**`frappe.db.exists()` in validate()**
+- Enforced at application level.
+- Can be bypassed in race conditions.
+- Used for conditional uniqueness.
+
+**Difference:** Database-level uniqueness is safer; validate() checks are for custom logic.
+
+## Document Permissions Check
+
+The output shows all permission values as 0, meaning the current user has no access to the Job Card. This happens when the user has no role permissions, is not the document owner, and the document has not been shared with them. The `frappe.get_doc_permissions(doc)` function returns the effective permissions for the logged-in user, which vary based on roles, ownership, and sharing settings.
 
 
 

@@ -117,10 +117,10 @@ app_license = "mit"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
+permission_query_conditions = {
+	"Job Card": "quickfix.quickfix.doctype.job_card.job_card.permission_query_conditions",
+}
+
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }
@@ -229,10 +229,15 @@ app_license = "mit"
 # ]
 
 fixtures=[
+    # "Role",
     {
-    'dt':'Device Type',
-    filter:['name', 'in', ['Smartphone','Laptop','Tablet']]
+    'dt':'DocPerm',
+    filter:['parent', 'in', ['Device Type','Technician','Spare Part','Job Card','Service Invoice']]
+    },
+    {
+        'dt':'Role'
     }
+    
 ]
 
 # Authentication and authorization

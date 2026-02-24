@@ -83,7 +83,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-24 10:58:33.861486",
+ "modified": "2026-02-24 13:54:23.626750",
  "modified_by": "Administrator",
  "module": "quickfix",
  "name": "Technician",
@@ -101,11 +101,29 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "read": 1,
+   "role": "QF Service Staff"
+  },
+  {
+   "if_owner": 1,
+   "read": 1,
+   "report": 1,
+   "role": "QF Technician"
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "QF Manager",
+   "write": 1
   }
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "technician_name"
 }

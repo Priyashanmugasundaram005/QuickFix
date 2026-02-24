@@ -43,3 +43,21 @@ def transfer_job(from_tech, to_tech):
         frappe.db.rollback()
         frappe.log_error(frappe.get_traceback(), "Job Transfer Failed")
         raise
+
+
+@frappe.whitelist()
+def share_job_card(job_card_name, user_email):
+    frappe.share.add(
+        doctype="Job Card",
+        name=job_card_name,
+        user=user_email,
+        read=1,
+        write=0,
+        share=0
+    )
+    return "Job Card shared successfully"
+
+@frappe.whitelist()
+def manager_action():
+    frappe.only_for("QF Manager")
+    return "Successfully"

@@ -118,20 +118,20 @@ app_license = "mit"
 # Permissions evaluated in scripted ways
 
 permission_query_conditions = {
-	"Job Card": "quickfix.quickfix.doctype.job_card.job_card.permission_query_conditions",
+	"Job Card": "quickfix.service_center.doctype.job_card.job_card.permission_query_conditions",
 }
 
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+	"Job Card": "quickfix.service_center.doctype.service_invoice.service_invoice.has_permission",
+}
 
 # DocType Class
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Job Card": "quickfix.overrides.custom_job_card.CustomJobCard"
+}
 
 # Document Events
 # ---------------

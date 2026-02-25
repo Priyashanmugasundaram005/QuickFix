@@ -277,6 +277,75 @@ If the row at `idx = 2` is deleted and the document is saved:
 
 The output shows all permission values as 0, meaning the current user has no access to the Job Card. This happens when the user has no role permissions, is not the document owner, and the document has not been shared with them. The `frappe.get_doc_permissions(doc)` function returns the effective permissions for the logged-in user, which vary based on roles, ownership, and sharing settings.
 
+## Recursion Pitfall in `on_update()` — Short Note
+
+###  Wrong Pattern
+
+```python
+def on_update(self):
+    self.save()  # causes infinite recursion
+```
+
+###  Why It’s Dangerous
+
+`save()` triggers the document lifecycle again → `on_update()` runs repeatedly → infinite loop, timeouts, high CPU usage.
+
+### Correct Pattern
+
+Modify fields directly (no save needed):
+
+```python
+def on_update(self):
+    self.status = "Updated"  #  safe
+```
+
+Or update DB without triggering hooks:
+
+```python
+frappe.db.set_value(self.doctype, self.name, "status", "Updated")
+```
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Part B — Upgrade Friction Analysis (Short)
+
+###  Risk: Missing `super().validate()` in override_doctype_class
+
+If Frappe adds new validations in `Job Card.validate()` and `super()` is not called:
+
+* Core validations are skipped
+* New framework checks won’t run
+* Invalid data may be saved
+* Upgrades can silently break business rules
+
+---
+
+###  Test to Catch This
+
+Try inserting a Job Card that violates a core validation.
+
+**Expected:** Insert fails
+**If it succeeds:** `super().validate()` is missing and core logic is bypassed.
+
+---
+
+###  Why `doc_events` is Safer
+
+* Preserves core logic
+* Upgrade-friendly
+* Multiple apps can hook safely
+* No need to maintain `super()` chain
+
+**override_doctype_class**
+
+* Replaces core controller
+* High upgrade risk
+* Must maintain compatibility manually
+
+**Rule:** Prefer `doc_events`; use override only when modifying core behavior is unavoidable.
+
+
+
 
 
  

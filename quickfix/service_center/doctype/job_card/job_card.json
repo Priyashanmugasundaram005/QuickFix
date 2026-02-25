@@ -34,6 +34,11 @@
  ],
  "fields": [
   {
+   "fieldname": "customer_and_device",
+   "fieldtype": "Section Break",
+   "label": "Customer & Device"
+  },
+  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -42,6 +47,12 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "reqd": 1
   },
   {
    "fieldname": "customer_phone",
@@ -172,26 +183,15 @@
    "in_list_view": 1,
    "label": "Status",
    "options": "Draft\nPending Diagnosis\nAwaiting Customer Approval\nIn Repair\nReady for Delivery\nDelivered\nCancelled"
-  },
-  {
-   "fieldname": "customer_and_device",
-   "fieldtype": "Section Break",
-   "label": "Customer & Device"
-  },
-  {
-   "fieldname": "customer_name",
-   "fieldtype": "Data",
-   "label": "Customer Name",
-   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-24 13:50:34.053771",
+ "modified": "2026-02-25 11:43:57.165740",
  "modified_by": "Administrator",
- "module": "quickfix",
+ "module": "Service Center",
  "name": "Job Card",
  "naming_rule": "Expression",
  "owner": "Administrator",

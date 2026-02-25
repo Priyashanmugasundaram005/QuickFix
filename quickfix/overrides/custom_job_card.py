@@ -1,5 +1,6 @@
 from quickfix.service_center.doctype.job_card.job_card import JobCard
 import frappe
+from frappe.utils import nowdate
 
 class CustomJobCard(JobCard):
     def validate(self):
@@ -24,3 +25,19 @@ class CustomJobCard(JobCard):
             settings=frappe.get_single_value("QuickFix Settings",'manager_email')
             frappe.log_error("sett",settings)
             frappe.enqueue("quickfix.utils.send_urgent_alert",job_card=self.name,manager=settings)
+
+
+
+def log(doc,method):
+    docttt=['Technician','Device Type','Spare Part','Job Card','QuickFix Settings','Service Invoice',"Part Usage Entry"]
+    if doc.doctype not in docttt:
+        return
+    frappe.get_doc({
+        "doctype":"Audit Log",
+        "doctype_name":doc.doctype,
+        "document_name":doc.name,
+        "action":method,
+        "user":frappe.session.user,
+        "timestamp":nowdate(),
+
+    }).insert(ignore_permissions=True)

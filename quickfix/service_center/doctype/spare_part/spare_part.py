@@ -19,6 +19,13 @@ class SparePart(Document):
 	def validate(self):
 		if self.selling_price<self.unit_cost:
 			frappe.throw("Selling Price should be greater than Unit Cost")
+
+	def on_update(self):
+		# Use frappe.db.get_single_value() for Single DocTypes to fetch one field efficiently
+  		# without loading the full document, improving performance in frequent calls like on_update.
+
+
+		threshold = frappe.db.get_value("QuickFix Settings", "low_stock_threshold")
 		
 
 

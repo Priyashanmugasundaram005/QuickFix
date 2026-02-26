@@ -1,7 +1,8 @@
 import frappe
 from frappe.utils import now_datetime, add_days
 from frappe.query_builder import DocType
-
+from frappe.client import get_count
+from quickfix.overrides.custom_job_card import create_audit_log
 
 @frappe.whitelist()
 def get_overdue_jobs():
@@ -61,3 +62,15 @@ def share_job_card(job_card_name, user_email):
 def manager_action():
     frappe.only_for("QF Manager")
     return "Successfully"
+
+
+
+
+@frappe.whitelist(allow_guest=True)
+def custom_get_count(doctype, filters=None, debug=False, cache=False):
+    # Log API usage
+    frappe.msgprint("Override is running")
+    create_audit_log(doctype_name=doctype, action="count_queried")
+
+    # Call original behavior
+    return get_count(doctype, filters, debug, cache)

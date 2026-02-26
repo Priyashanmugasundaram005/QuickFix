@@ -368,6 +368,179 @@ When saving a **Job Card**, Frappe executes validate handlers in the following o
   - **Specific DocType handler runs before wildcard**.  
   - If the first handler throws an error, the wildcard handler will **not** execute.
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Part – Asset Hooks & Client Scripts (QuickFix)
+
+## 1. app_include_js vs web_include_js
+
+### app_include_js
+Loads a JavaScript file only in the **Frappe Desk** (for logged-in users).
+
+**Used for:**
+- Internal UI tweaks
+- Employee workflow helpers
+- Desk notifications or shortcuts
+
+### web_include_js
+Loads a JavaScript file only on **Website/Portal pages**.
+
+**Used for:**
+- Customer portal enhancements
+- Web form validation
+- Public-facing UI interactions
+
+---
+
+## 2. DocType Client Scripts
+
+### doctype_js (Job Card)
+Runs only when the **Job Card form** is opened.
+
+**Use cases:**
+- Field validation
+- Auto-calculations
+- Dynamic field behavior
+
+### doctype_list_js (Job Card)
+Runs on the **Job Card list view**.
+
+**Use cases:**
+- Custom list buttons
+- Row highlighting
+- Bulk actions & filters
+
+---
+
+## 3. doctype_tree_js (Not applicable for Job Card)
+
+Tree view is used for DocTypes with hierarchical (parent–child) data.
+
+**Examples:**
+- Chart of Accounts
+- Item Group
+- Territory
+- Department
+
+**Why use tree view?**
+- Visualize hierarchy
+- Easy navigation
+- Manage parent-child relationships
+
+Job Card does not use a tree view because it has no hierarchy.
+
+---
+
+## 4. Build & Cache Busting
+
+### What it does
+- Compiles and bundles JS/CSS files
+- Generates hashed filenames
+- Updates asset manifest
+
+### Why cache busting is needed
+Browsers cache JS files. After changes, old files may still load.
+
+Cache busting ensures:
+- Latest JS is loaded
+- Prevents stale scripts
+- Avoids debugging issues
+
+---
+
+## 5. When to Run bench build
+Run this command after:
+- Modifying JS or CSS
+- Adding asset hooks
+- Updating client scripts
+- Deploying to production
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Override `frappe.client.get_count` – Internal Notes
+
+### ✅ Tests
+
+**1. Confirm override is called**
+
+* Call: `frappe.client.get_count("Job Card")`
+* Verify: New entry in **Audit Log** with action `count_queried`.
+
+**2. Confirm original logic still works**
+
+* Compare:
+
+  * `frappe.client.get_count("Job Card")`
+  * `frappe.db.count("Job Card")`
+* Both counts must match.
+
+**3. Confirm other apps are not broken**
+
+* Any app calling `frappe.client.get_count` still receives correct count.
+* No errors or behavior changes except logging.
+
+---
+
+### 🔁 override_whitelisted_methods vs Monkey Patching
+
+| Feature     | Hook Override | Monkey Patching   |
+| ----------- | ------------- | ----------------- |
+| Mechanism   | hooks.py      | import-time code  |
+| Visibility  | Explicit      | Hidden            |
+| Safety      | Upgrade-safe  | Breaks on updates |
+| Reversible  | Yes           | No                |
+| Recommended | ✅ Yes        | ❌ Avoid          |
+
+**When to use**
+
+* Use **override_whitelisted_methods** for production-safe customization.
+* Use monkey patching only for temporary debugging or experiments.
+
+---
+
+### ⚠️ Multiple Apps Overriding Same Method
+
+If two apps override the same method:
+
+* The app **last in apps.txt order wins**.
+* Only one override runs.
+* No automatic chaining.
+
+---
+
+### ⚠️ Signature Mismatch
+
+Override must match original signature:
+
+```python id="j6db9x"
+get_count(doctype, filters=None, debug=False, cache=False)
+```
+
+If arguments differ, Frappe cannot map parameters → **TypeError**.
+
+**Example Error**
+
+```
+TypeError: custom_get_count() missing required positional argument 'doctype'
+```
+
+**When it occurs**
+
+* Missing parameters
+* Different parameter order
+* Extra required parameters
+
+---
+
+### 🧾 Summary
+
+* Override is safe, explicit, and upgrade-friendly.
+* Original functionality must be preserved.
+* Signature must match exactly.
+* Last installed app override takes precedence.
+
+---
+
 
 
  

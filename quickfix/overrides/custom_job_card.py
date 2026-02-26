@@ -31,20 +31,27 @@ class CustomJobCard(JobCard):
 
 
 
-def log(doc,method):
-    docttt=['Technician','Device Type','Spare Part','Job Card','QuickFix Settings','Service Invoice',"Part Usage Entry"]
-    if doc.doctype not in docttt:
-        return
+def create_audit_log(doctype_name, document_name=None, action="api_call"):
     frappe.get_doc({
-        "doctype":"Audit Log",
-        "doctype_name":doc.doctype,
-        "document_name":doc.name,
-        "action":method,
-        "user":frappe.session.user,
-        "timestamp":nowdate(),
-
+        "doctype": "Audit Log",
+        "doctype_name": doctype_name,
+        "document_name": document_name,
+        "action": action,
+        "user": frappe.session.user,
+        "timestamp": nowdate(),
     }).insert(ignore_permissions=True)
 
+def log(doc, method):
+    allowed = [
+        'Technician', 'Device Type', 'Spare Part',
+        'Job Card', 'QuickFix Settings',
+        'Service Invoice', 'Part Usage Entry'
+    ]
+
+    if doc.doctype not in allowed:
+        return
+
+    create_audit_log(doc.doctype, doc.name, method)
 
 # def validate_job_card(doc, method):
 #     # Hook-level validation

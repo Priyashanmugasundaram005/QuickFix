@@ -28,6 +28,8 @@ app_license = "mit"
 # app_include_css = "/assets/quickfix/css/quickfix.css"
 app_include_js = "/assets/quickfix/js/quickfix.js"
 
+# website_route_rules=[{"form_route":"/track-job","to_route":"track-job"}]
+
 # include js, css files in header of web template
 # web_include_css = "/assets/quickfix/css/quickfix.css"
 # web_include_js = "/assets/quickfix/js/quickfix.js"
@@ -74,10 +76,10 @@ app_include_js = "/assets/quickfix/js/quickfix.js"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "quickfix.utils.jinja_methods",
-# 	"filters": "quickfix.utils.jinja_filters"
-# }
+jinja = {
+	"methods": "quickfix.utils.get_shop_name",
+	"filters": "quickfix.utils.format_job_id"
+}
 
 # Installation
 # ------------
@@ -144,16 +146,16 @@ on_logout="quickfix.service_center.doctype.audit_log.audit_log.log_out"
 # Hook on document methods and events
 
 doc_events = {
-	# "*": {
-	# 	"on_update": "quickfix.overrides.custom_job_card.log",
-    #     "on_submit":"quickfix.overrides.custom_job_card.log",
-    #     "on_save":"quickfix.overrides.custom_job_card.log",
-	# 	"on_cancel": "quickfix.overrides.custom_job_card.log",
-	# 	"on_trash": "quickfix.overrides.custom_job_card.log"
-	#  }
-    # "Job Card":{
-    #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"
-    # }
+	"*": {
+		"on_update": "quickfix.overrides.custom_job_card.log",
+        "on_submit":"quickfix.overrides.custom_job_card.log",
+        "on_save":"quickfix.overrides.custom_job_card.log",
+		"on_cancel": "quickfix.overrides.custom_job_card.log",
+		"on_trash": "quickfix.overrides.custom_job_card.log"
+	 },
+    "Job Card":{
+        "validate":"quickfix.overrides.custom_job_card.validate_job_card"
+    }
 }
 
 # Scheduled Tasks
@@ -185,9 +187,9 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "quickfix.event.get_events"
-# }
+override_whitelisted_methods = {
+	"frappe.client.get_count": "quickfix.api.custom_get_count"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,

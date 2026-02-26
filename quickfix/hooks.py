@@ -26,7 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/quickfix/css/quickfix.css"
-# app_include_js = "/assets/quickfix/js/quickfix.js"
+app_include_js = "/assets/quickfix/js/quickfix.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/quickfix/css/quickfix.css"
@@ -82,13 +82,15 @@ app_license = "mit"
 # Installation
 # ------------
 
+extend_bootinfo = "quickfix.overrides.custom_job_card.extend_bootinfo"
+
 # before_install = "quickfix.install.before_install"
-# after_install = "quickfix.install.after_install"
+after_install = "quickfix.overrides.custom_job_card.install"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "quickfix.uninstall.before_uninstall"
+before_uninstall = "quickfix.overrides.custom_job_card.before_install"
 # after_uninstall = "quickfix.uninstall.after_uninstall"
 
 # Integration Setup
@@ -133,18 +135,25 @@ override_doctype_class = {
 	"Job Card": "quickfix.overrides.custom_job_card.CustomJobCard"
 }
 
+on_session_creation=['quickfix.service_center.doctype.audit_log.audit_log.log_in']
+
+on_logout="quickfix.service_center.doctype.audit_log.audit_log.log_out"
+
 # Document Events
 # ---------------
 # Hook on document methods and events
 
 doc_events = {
-	"*": {
-		"on_update": "quickfix.overrides.custom_job_card.log",
-        "on_submit":"quickfix.overrides.custom_job_card.log",
-        "on_save":"quickfix.overrides.custom_job_card.log",
-		"on_cancel": "quickfix.overrides.custom_job_card.log",
-		"on_trash": "quickfix.overrides.custom_job_card.log"
-	}
+	# "*": {
+	# 	"on_update": "quickfix.overrides.custom_job_card.log",
+    #     "on_submit":"quickfix.overrides.custom_job_card.log",
+    #     "on_save":"quickfix.overrides.custom_job_card.log",
+	# 	"on_cancel": "quickfix.overrides.custom_job_card.log",
+	# 	"on_trash": "quickfix.overrides.custom_job_card.log"
+	#  }
+    # "Job Card":{
+    #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"
+    # }
 }
 
 # Scheduled Tasks
@@ -237,8 +246,13 @@ fixtures=[
     filter:['parent', 'in', ['Device Type','Technician','Spare Part','Job Card','Service Invoice']]
     },
     {
-        'dt':'Role'
-    }
+        'dt':'Role',
+        filter:['parent','in',['QF Manager','QF Technician','QF Service Staff']]
+        
+    }, 
+    
+
+
     
 ]
 

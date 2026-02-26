@@ -34,13 +34,28 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-25 11:42:19.580109",
+ "modified": "2026-02-26 12:07:08.682092",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Device Type",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
+  {
+   "read": 1,
+   "role": "QF Service Staff"
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "QF Manager",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "QF Technician"
+  },
   {
    "create": 1,
    "delete": 1,
@@ -51,21 +66,6 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
-   "write": 1
-  },
-  {
-   "read": 1,
-   "role": "QF Service Staff"
-  },
-  {
-   "read": 1,
-   "role": "QF Technician"
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "read": 1,
-   "role": "QF Manager",
    "write": 1
   }
  ],

@@ -9,7 +9,8 @@ from frappe.utils import nowdate
 
 
 class JobCard(Document):
-	def validate(self):
+	pass
+	def valuybidate(self):
 		total=0
 		frappe.log_error("111")
 		if self.customer_phone:
@@ -23,6 +24,8 @@ class JobCard(Document):
 			frappe.throw("Assigned Technician not available. Select other technician")
 
 		
+
+		
 		for row in self.parts_used:
 			qty = row.quantity or 0
 			rate = row.unit_price or 0
@@ -32,6 +35,13 @@ class JobCard(Document):
 		if not self.labour_charge:
 			self.labour_charge=frappe.db.get_single_value("QuickFix Settings",'default_labour_charge')
 		self.final_amount=self.parts_total+self.labour_charge
+
+		# if not self.device_model:
+		# 	frappe.msgprint("Customer Name is required (Controller)")
+		# frappe.msgprint("Controller validate executed")
+            
+
+        
 
 	def before_submit(self):
 		if self.status!="Ready for Delivery":

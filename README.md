@@ -345,6 +345,28 @@ Try inserting a Job Card that violates a core validation.
 **Rule:** Prefer `doc_events`; use override only when modifying core behavior is unavoidable.
 
 
+## Part B – Multiple Validate Handlers
+
+### Execution Order
+
+When saving a **Job Card**, Frappe executes validate handlers in the following order:
+
+1. **Controller `validate()` method**  
+2. **`doc_events` handler for Job Card**  
+3. **Wildcard `"*"` handler** (if defined)  
+
+### If Both Handlers Raise `frappe.ValidationError`
+
+- Execution stops at the first error.  
+- Remaining handlers will **not** run.  
+- Only **one error message** appears on the Desk.  
+
+### `"*"` and Specific DocType Handler Together
+
+- If both are registered for the same event:  
+  - Both handlers run in sequence.  
+  - **Specific DocType handler runs before wildcard**.  
+  - If the first handler throws an error, the wildcard handler will **not** execute.
 
 
 

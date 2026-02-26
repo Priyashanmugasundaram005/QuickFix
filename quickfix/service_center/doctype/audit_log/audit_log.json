@@ -14,17 +14,23 @@
  "fields": [
   {
    "fieldname": "doctype_name",
-   "fieldtype": "Data",
-   "label": "Doctype Name"
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Doctype Name",
+   "options": "DocType"
   },
   {
    "fieldname": "document_name",
-   "fieldtype": "Data",
-   "label": "Document Name"
+   "fieldtype": "Dynamic Link",
+   "label": "Document Name",
+   "options": "doctype_name"
   },
   {
    "fieldname": "action",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Action"
   },
   {
@@ -41,7 +47,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-25 20:20:09.813371",
+ "modified": "2026-02-26 13:26:35.205215",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Audit Log",

@@ -2,9 +2,12 @@ from quickfix.service_center.doctype.job_card.job_card import JobCard
 import frappe
 from frappe.utils import nowdate
 
+
+
 class CustomJobCard(JobCard):
+    pass
     def validate(self):
-        super().validate()
+        # super().validate()
         frappe.log_error("valll")
         self._check_urgent_unassigned()
 
@@ -41,3 +44,75 @@ def log(doc,method):
         "timestamp":nowdate(),
 
     }).insert(ignore_permissions=True)
+
+
+# def validate_job_card(doc, method):
+#     # Hook-level validation
+#     if doc.priority == "Urgent" :
+#         frappe.msgprint("Urgent jobs must have a technician (Hook)")
+
+#     frappe.msgprint("Hook validate executed")
+
+def install():
+    data=[
+
+        {
+            "average_repair_hours": 24,
+            "description": "Smartphone description",
+            "device_type": "Smartphone",
+        },
+        {
+            "average_repair_hours": 48,
+            "description": "Laptop description",
+            "device_type": "Laptop",
+        },
+        {
+            "average_repair_hours": 24,
+            "description": "Tablet description",
+            "device_type": "Tablet",
+        }]
+
+    for row in data:
+        if not frappe.db.exists("Device Type",row['device_type']):
+            device=frappe.get_doc(
+                {
+                    "doctype":"Device Type",
+                    "device_type":row["device_type"],
+                    "description":row["description"],
+                    "average_repair_hours":row["average_repair_hours"]
+                }
+            )
+            device.insert(ignore_permissions=True)
+
+    # For Single Doctype
+    settings = frappe.get_single("QuickFix Settings")
+    settings.shop_name = "QuickFix"
+    settings.manager_email = "yashinishan2005.com"
+    settings.default_labour_charge = 500
+    settings.low_stock_threshold = 5
+    settings.low_stock_alert_enable = 1
+    settings.save(ignore_permissions=True)
+
+    print("Successfully Executed after_install hook")
+
+
+def before_uninstall():
+    data = frappe.get_all("Job Card",
+            filters={
+                "docstatus":1
+            }
+        )
+    if data:
+        raise frappe.ValidationError(
+            _("App Uninstall Restricted Due to Submitted Job Cards — Cancel Required Before Removal."))
+
+
+def extend_bootinfo(bootinfo):
+    settings = frappe.get_single("QuickFix Settings")
+
+    # Add custom values to bootinfo
+    bootinfo.quickfix_shop_name = settings.shop_name
+    bootinfo.quickfix_manager_email = settings.manager_email
+
+
+    

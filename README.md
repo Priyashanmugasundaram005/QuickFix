@@ -530,16 +530,93 @@ TypeError: custom_get_count() missing required positional argument 'doctype'
 * Different parameter order
 * Extra required parameters
 
+
+## Fieldname Collision Risk
+
+When adding Custom Fields in Frappe, using a fieldname that may later be introduced by the core framework for the same DocType can lead to a **fieldname collision**.
+
+### Effects
+- Migration failure due to duplicate column creation
+- Database schema conflicts
+- Possible data loss
+- UI inconsistencies or unexpected behavior
+
+### Prevention
+Use unique, app-prefixed fieldnames to avoid conflicts with future Frappe updates.
+
+**Recommended pattern:**
+- `qf_priority`
+- `qf_service_status`
+- `qf_internal_notes`
+
+Using a prefix (e.g., `qf_` for QuickFix) ensures custom fields remain isolated from core changes.
+
 ---
 
-### 🧾 Summary
+## Patch Ordering & `patches.txt`
 
-* Override is safe, explicit, and upgrade-friendly.
-* Original functionality must be preserved.
-* Signature must match exactly.
-* Last installed app override takes precedence.
+If Patch 1 creates a Custom Field and Patch 2 reads or updates it, they must be listed as **separate entries** in `patches.txt`.
 
----
+### Why This Matters
+- Patches run sequentially in the listed order
+- Ensures the field exists before being accessed
+- Allows safe resume if migration fails
+- Simplifies debugging and rollback
+
+### Best Practice
+```txt
+# patches.txt
+quickfix.patches.v1_0.create_custom_fields
+quickfix.patches.v1_0.update_custom_field_values
+
+Patch Safety – Quick Revision
+_qf_patched Guard
+
+Prevents a monkey patch from running multiple times during reloads.
+
+Without it:
+
+Infinite recursion
+
+Duplicate validations/DB writes
+
+Performance issues
+
+Unpredictable bugs
+
+Why monkey_patches.py (not __init__.py)?
+
+Centralized, auditable patch location
+
+Predictable execution
+
+Easier debugging & disabling
+
+Lower upgrade risk
+
+Escalation Order (Use in this order)
+
+doc_events → safest, upgrade-friendly
+
+override_doctype_class → controlled controller override
+
+override_whitelisted_methods → alters API behavior
+
+monkey patch → last resort, high risk
+
+👉 Deeper override = higher fragility.
+
+Monkey Patch Risks
+
+Breaks after updates
+
+Hidden side effects
+
+Hard to maintain
+
+Rule
+
+If hooks can solve it, never use a monkey patch.
 
 
 

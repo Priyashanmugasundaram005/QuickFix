@@ -1,0 +1,60 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="track-job-container" style="max-width:650px; margin:80px auto; padding:20px; background:#f9f9f9; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+    
+    <h2 class="track-job-title" style="margin-bottom:25px; text-align:center; color:#333;">Track Your Job Status</h2>
+
+    <form method="GET" action="/track-job">
+        <div class="form-group track-job-form-group">
+            <label for="job_id" style="font-weight:500;">Select Job ID</label>
+
+            {% set job_cards = frappe.get_all("Job Card", pluck="name", order_by="creation asc") %}
+
+            <select name="job_id" 
+                    id="job_id" 
+                    class="form-control track-job-select" 
+                    required>
+                
+                <option value="">-- Choose Job Card --</option>
+
+                {% for jc in job_cards %}
+                    <option value="{{ jc }}">{{ jc }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button type="submit" class="btn btn-success track-job-btn" style="padding:8px 25px; font-weight:500;">
+                Track Job
+            </button>
+        </div>
+    </form>
+
+    {% if frappe.form_dict.job_id %}
+        <hr style="margin:30px 0; border-top:1px solid #ddd;">
+
+        {% set job = frappe.get_doc("Job Card", frappe.form_dict.job_id) %}
+
+        {% if job %}
+            <h4 style="margin-bottom:15px; color:#444;">Job Details</h4>
+            <ul class="track-job-details" style="list-style:none; padding-left:0; line-height:1.8;">
+                <li><strong>Customer:</strong> {{ job.customer_name }}</li>
+                <li><strong>Status:</strong> {{ job.status }}</li>
+                <li><strong>Payment Status:</strong> {{ job.payment_status }}</li>
+                {% set tech = frappe.db.get_value("Technician", job.assigned_technician, "technician_name") %}
+                <li><strong>Assigned Technician:</strong> {{ tech or 'Not Assigned' }}</li>
+                <li><strong>Parts Total Amount:</strong> {{ job.parts_total }}</li>
+                <li><strong>Labour Charge:</strong> {{ job.labour_charge }}</li>
+                <li><strong>Total Amount:</strong> {{ job.final_amount }}</li>
+            </ul>
+        {% else %}
+            <p style="color:red; font-weight:500;">Invalid Job ID. Please select a valid job card.</p>
+        {% endif %}
+    {% endif %}
+
+</div>
+
+{% endblock %}

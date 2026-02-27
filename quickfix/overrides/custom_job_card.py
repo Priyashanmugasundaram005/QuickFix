@@ -61,6 +61,8 @@ def log(doc, method):
 #     frappe.msgprint("Hook validate executed")
 
 def install():
+    make_remarks()
+    
     data=[
 
         {
@@ -101,6 +103,14 @@ def install():
     settings.save(ignore_permissions=True)
 
     print("Successfully Executed after_install hook")
+
+def make_remarks():
+    frappe.make_property_setter(
+        doctype="Job Card",
+        fieldname="remarks",
+        property="bold",
+        value=1,
+        property_type="check")
 
 
 def before_uninstall():

@@ -29,6 +29,17 @@ app_license = "mit"
 app_include_js = "/assets/quickfix/js/quickfix.js"
 
 # website_route_rules=[{"form_route":"/track-job","to_route":"track-job"}]
+website_route_rules = [
+    {"from_route": "/track-job", "to_route": "track-job"}
+]
+
+portal_menu_items = [
+    {
+        "title": "Track My Job",
+        "route": "/track-job",
+        "role": "Guest"
+    }
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/quickfix/css/quickfix.css"
@@ -243,16 +254,28 @@ override_whitelisted_methods = {
 
 fixtures=[
     # "Role",
+    # {
+    # 'dt':'DocPerm',
+    # filter:['parent', 'in', ['Device Type','Technician','Spare Part','Job Card','Service Invoice']]
+    # },
+    # {
+    #     'dt':'Role',
+    #     filter:['parent','in',['QF Manager','QF Technician','QF Service Staff']]
+        
+    # }, 
+     "Custom Field",
+    "Property Setter",
+    "Role",
+    "Workspace",
     {
-    'dt':'DocPerm',
-    filter:['parent', 'in', ['Device Type','Technician','Spare Part','Job Card','Service Invoice']]
+        "doctype": "Device Type",
+        "filters": [
+            ["name", "in", ["Smartphone", "Laptop", "Tablet"]]
+        ]
     },
     {
-        'dt':'Role',
-        filter:['parent','in',['QF Manager','QF Technician','QF Service Staff']]
-        
-    }, 
-    
+        "doctype": "QuickFix Settings"
+    }
 
 
     

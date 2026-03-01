@@ -5,9 +5,9 @@ from frappe.utils import nowdate
 
 
 class CustomJobCard(JobCard):
-    pass
+    
     def validate(self):
-        # super().validate()
+        super().validate()
         frappe.log_error("valll")
         self._check_urgent_unassigned()
 
@@ -121,7 +121,8 @@ def before_uninstall():
         )
     if data:
         raise frappe.ValidationError(
-            _("App Uninstall Restricted Due to Submitted Job Cards — Cancel Required Before Removal."))
+            ("App Uninstall Restricted Due to Submitted Job Cards — Cancel Required Before Removal.")
+        )
 
 
 def extend_bootinfo(bootinfo):

@@ -9,8 +9,8 @@ from frappe.utils import nowdate
 
 
 class JobCard(Document):
-	pass
-	def valuybidate(self):
+	
+	def validate(self):
 		total=0
 		frappe.log_error("111")
 		if self.customer_phone:
@@ -102,6 +102,15 @@ class JobCard(Document):
 	# def on_update(self):
 	# 	frappe.log_error("loggggggggg")
 	# 	self.save()
+
+	@frappe.whitelist()
+	def technician(self):
+		frappe.log_error(self.device_type)
+		tech=frappe.get_all("Technician",{'status':'Active','specialization':self.device_type},pluck='name')
+		frappe.log_error("rtyu",tech)
+		return tech
+
+
 
 
 

@@ -164,9 +164,9 @@ doc_events = {
 		"on_cancel": "quickfix.overrides.custom_job_card.log",
 		"on_trash": "quickfix.overrides.custom_job_card.log"
 	 },
-    "Job Card":{
-        "validate":"quickfix.overrides.custom_job_card.validate_job_card"
-    }
+    # "Job Card":{
+    #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"
+    # }
 }
 
 # Scheduled Tasks
@@ -263,19 +263,18 @@ fixtures=[
     #     filter:['parent','in',['QF Manager','QF Technician','QF Service Staff']]
         
     # }, 
-     "Custom Field",
+    "Custom Field",
     "Property Setter",
     "Role",
     "Workspace",
+    "QuickFix Settings",
     {
-        "doctype": "Device Type",
+        "dt": "Device Type",
         "filters": [
             ["name", "in", ["Smartphone", "Laptop", "Tablet"]]
         ]
-    },
-    {
-        "doctype": "QuickFix Settings"
     }
+    
 
 
     

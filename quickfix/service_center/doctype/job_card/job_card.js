@@ -8,29 +8,111 @@
 // });
 
 frappe.ui.form.on("Job Card", {
-	setup(frm) {
-        value=frappe.db.get_single_value("QuickFix Settings",'default_labour_charge')
-        .then(value=>{
-            frm.set_value('labour_charge',value)
-        })
+    
+    setup(frm) {
+        value = frappe.db.get_single_value("QuickFix Settings", 'default_labour_charge')
+            .then(value => {
+                frm.set_value('labour_charge', value)
+            })
+
+    },
+
+    device_type: function (frm) {
+        console.log("yesss")
+        frm.call('technician')
+            .then(r => {
+                tech = r.message
+                frm.set_query('assigned_technician', () => {
+                    return {
+                        filters: {
+                            name: ['in', tech]
+
+                        }
+
+                    }
+                })
+
+            })
 
 
-	},
+
+    },
+    refresh(frm) {
+        add_color(frm);
+        button(frm);
+        name = frappe.boot.quickfix_shop_name
+        if (name)
+            frm.page.set_title(
+                `Shop : ${name}`
+            )
+        // frm.page.set_indicator(
+        //         __("Shop: {0}", [frappe.boot.quickfix_shop_name]),
+        //         "blue"
+        //     );
+
+
+    },
+    status: add_color
+
 });
 
+function button(frm) {
+    console.log("iuygfvb")
+    if (frm.doc.status === "Ready for Delivery" && frm.doc.docstatus === 1) {
+        frm.add_custom_button(("Mark as Delivered"))
+    }
+}
 
-frappe.ui.form.on('Part Usage Entry',{
-    part:function(frm,cdt,cdn){
+function add_color(frm) {
+    frm.dashboard.clear_headline();
+    const colors = {
+        "Open": "blue",
+        "Pending Diagnosis": "orange",
+        "In Repair": "orange",
+        "Ready for Delivery": "green",
+        "Delivered": "green",
+        "Cancelled": "red"
+    };
+
+    if (frm.doc.status)
+        frm.dashboard.add_indicator(('status: ') + frm.doc.status, colors[frm.doc.status] || 'gray')
+}
+
+
+frappe.ui.form.on('Part Usage Entry', {
+    part: function (frm, cdt, cdn) {
         console.log("patrs")
-        let list=[]
+        let list = []
         console.log(list)
-        frm.doc.parts_used.forEach(parts=>{
-            if(list.includes(parts.part))
+        frm.doc.parts_used.forEach(parts => {
+            if (list.includes(parts.part))
                 frappe.throw(`${parts.part} is already added`)
             else
                 list.push(parts.part)
         }
         )
+    },
+    
+    quantity: function (frm, cdt, cdn) {
+        
+        // frm.doc.parts_used.forEach(p=>{
+        console.log("poiuhb")
+        const row = locals[cdt][cdn]
+        const price = row.unit_price * row.quantity
+        frappe.model.set_value(cdt,cdn,'total_price', price)
+        let total=0
+        let tot=0
+        frm.doc.parts_used.forEach(r=>
+        {
+            total+=r.total_price || 0
+        }
+
+        )
+        frm.set_value('parts_total',total)
+        tot=frm.doc.parts_total+frm.doc.labour_charge
+        frm.set_value('final_amount',tot)
+        
+
     }
 
 })

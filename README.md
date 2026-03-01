@@ -455,7 +455,7 @@ Run this command after:
 - Updating client scripts
 - Deploying to production
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Override `frappe.client.get_count` – Internal Notes
 
@@ -564,64 +564,78 @@ If Patch 1 creates a Custom Field and Patch 2 reads or updates it, they must be 
 - Simplifies debugging and rollback
 
 ### Best Practice
-```txt
 # patches.txt
 quickfix.patches.v1_0.create_custom_fields
 quickfix.patches.v1_0.update_custom_field_values
 
-Patch Safety – Quick Revision
+### Patch Safety – Quick Revision
 _qf_patched Guard
-
 Prevents a monkey patch from running multiple times during reloads.
 
-Without it:
+**Without it**
 
 Infinite recursion
-
-Duplicate validations/DB writes
-
+Duplicate validations / DB writes
 Performance issues
-
 Unpredictable bugs
 
-Why monkey_patches.py (not __init__.py)?
+### Why monkey_patches.py (not __init__.py)?
 
 Centralized, auditable patch location
-
 Predictable execution
-
 Easier debugging & disabling
-
 Lower upgrade risk
 
-Escalation Order (Use in this order)
+### Escalation Order (Use in this order)
 
 doc_events → safest, upgrade-friendly
-
 override_doctype_class → controlled controller override
-
 override_whitelisted_methods → alters API behavior
-
 monkey patch → last resort, high risk
 
-👉 Deeper override = higher fragility.
+👉 Deeper override = higher fragility
 
-Monkey Patch Risks
+### Monkey Patch Risks
 
-Breaks after updates
-
+Breaks after framework updates
 Hidden side effects
-
 Hard to maintain
 
-Rule
+### Client Validation & Async Calls — Quick Notes
+❌ frappe.call inside validate (before_save)
 
-If hooks can solve it, never use a monkey patch.
+Assertion: This pattern does not work reliably.
 
+**Why?**
 
+validate is synchronous.
+frappe.call is asynchronous.
+Form saves before the server response returns.
+Errors thrown in callback cannot stop save.
 
- 
+**Result**
 
-  
+Race condition
+Late error messages
+Inconsistent data
 
+Rule: Never use async calls to block save. Use server-side validation instead.
+
+## Use Server-Side Validation (Recommended)
+
+Server validation runs synchronously and reliably stops the save.
+
+## Async Fetch → Use onload or refresh
+
+Assertion: Async calls belong in onload or refresh, not in validate.
+
+**Why?**
+Runs after form loads
+Safe for server calls
+Does not interfere with save
+
+**Use cases**
+Fetch related data
+Populate fields
+Show alerts or indicators
 

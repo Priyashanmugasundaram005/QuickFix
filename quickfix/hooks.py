@@ -26,7 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/quickfix/css/quickfix.css"
-app_include_js = "/assets/quickfix/js/quickfix.js"
+app_include_js = "quickfix.bundle.js"
 
 # website_route_rules=[{"form_route":"/track-job","to_route":"track-job"}]
 website_route_rules = [
@@ -57,7 +57,7 @@ portal_menu_items = [
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {"Job Card" : "public/job_card/job_card_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 

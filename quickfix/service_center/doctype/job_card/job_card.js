@@ -15,7 +15,9 @@ frappe.ui.form.on("Job Card", {
                 frm.set_value('labour_charge', value)
             })
 
-    },
+        },
+    
+    
 
     device_type: function (frm) {
         console.log("yesss")
@@ -50,11 +52,73 @@ frappe.ui.form.on("Job Card", {
         //         "blue"
         //     );
 
+        frm.add_custom_button("Reject Job",()=>{
+            let dialog =new frappe.ui.Dialog({
+                title:'Reject',
+                fields:[
+                    {
+                        label: 'Rejection Reason',
+                        fieldname: 'reason',
+                        fieldtype: 'Small Text',
+                        reqd:1
+                    }
+                ],
+                primary_action_label:'Submit',
+                primary_action(values){
+                    console.log(values)
+                    frappe.msgprint("Job Rejected");
+                    dialog.hide();
+                }
+            });
+            dialog.show();
+    });
+
+    if (frm.doc.docstatus !=1){
+    frm.add_custom_button("Transfer Technician",()=>
+    {
+        frappe.prompt([{
+
+            label: 'New Technician',
+            fieldname: 'new',
+            fieldtype: 'Link',
+            options:'Technician',
+            reqd:1
+
+        }],(values)=>{
+            frappe.confirm("Do you need to proceed with this Technician",()=>{
+                frm.trigger('assigned_technician')
+                frm.call('new_tech',{new_technician:values.new})
+            })
+        }
+    )
+    })}
+
 
     },
-    status: add_color
+    status: add_color,
+    onload(frm) {
+        console.log("innn")
+        frm.call('real')
+        frappe.realtime.on("job_ready", (data) => {
+            
+            // if (data.name === frm.doc.name) {
+            console.log("ouuu")
+                frappe.show_alert({
+                    message:("Job is Ready"),
+                    indicator: "green"
+                });
+            // }
+        });
+    },
+    assigned_technician: function (frm) {
+    {
+        console.log("jhuib")
+        frm.call('validate')
+    }
+}
 
 });
+
 
 function button(frm) {
     console.log("iuygfvb")

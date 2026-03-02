@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../apps/quickfix/quickfix/public/js/navbar.js"],
+  "sourcesContent": ["frappe.provide(\"frappe.views\")\n// console.log(34567890)\n setTimeout(() =>{\n    if (frappe.boot.quickfix_sname) {\n        let shop_name = frappe.boot.quickfix_sname;\n        $(\".navbar-home\").append(\n            `<span style=\"margin-left:10px; font-weight:600;\">\n                ${shop_name}\n            </span>`\n        );\n    }\n},100)"],
+  "mappings": ";;AAAA,SAAO,QAAQ,cAAc;AAE5B,aAAW,MAAK;AACb,QAAI,OAAO,KAAK,gBAAgB;AAC5B,UAAI,YAAY,OAAO,KAAK;AAC5B,QAAE,cAAc,EAAE;AAAA,QACd;AAAA,kBACM;AAAA;AAAA,MAEV;AAAA,IACJ;AAAA,EACJ,GAAE,GAAG;",
+  "names": []
+}

@@ -639,3 +639,48 @@ Fetch related data
 Populate fields
 Show alerts or indicators
 
+## 🌳 Tree DocType – Quick Notes
+
+A **Tree DocType** stores hierarchical data (parent → child) in an expandable tree.
+
+### Examples
+- Account → Chart of Accounts  
+- Employee → Manager hierarchy  
+- Item Group → Categories  
+
+---
+
+## doctype_tree_js
+
+Used to add custom JS for **Tree View only**.
+
+### hooks.py
+```python
+doctype_tree_js = {
+    "Account": "public/js/account_tree.js"
+}
+
+Uses
+
+Custom buttons
+
+Expand/collapse control
+
+Node UI customization
+
+How Tree Works
+
+Root nodes load first
+
+Children load on expand
+
+is_group shows expand icon
+
+Common Errors
+
+Missing is_group → no expand
+
+Wrong parent field → broken hierarchy
+
+Using list JS → no effect
+

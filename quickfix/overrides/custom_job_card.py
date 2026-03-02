@@ -5,7 +5,7 @@ from frappe.utils import nowdate
 
 
 class CustomJobCard(JobCard):
-    
+    @frappe.whitelist()
     def validate(self):
         super().validate()
         frappe.log_error("valll")

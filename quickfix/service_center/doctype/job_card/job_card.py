@@ -10,6 +10,7 @@ from frappe.utils import nowdate
 
 class JobCard(Document):
 	
+	@frappe.whitelist()
 	def validate(self):
 		total=0
 		frappe.log_error("111")
@@ -109,6 +110,18 @@ class JobCard(Document):
 		tech=frappe.get_all("Technician",{'status':'Active','specialization':self.device_type},pluck='name')
 		frappe.log_error("rtyu",tech)
 		return tech
+
+	@frappe.whitelist()
+	def real(self):
+		frappe.log_error("reallll")
+		frappe.publish_realtime(
+		event="job_ready",
+		message={"name": 'name'})
+
+	@frappe.whitelist()
+	def new_tech(self,new_technician):
+		frappe.log_error(new_technician)
+		self.assigned_technician=new_technician
 
 
 

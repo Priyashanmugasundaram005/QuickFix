@@ -133,22 +133,22 @@ class JobCard(Document):
 
 
 def permission_query_conditions(user):
-	if user=="Administrator":
+	if user=="priyashanmugasundaram2005@gmail.com":
 		return""
-	if "QF Technician" in frappe.get_roles(user):
-		technician_names = frappe.get_all(
-            "Technician",
-            filters={"user": user},
-            pluck="name"
-        )
-		if technician_names:
-			return f"""
-        `tabJob Card`.assigned_technician IN (
-            SELECT name FROM `tabTechnician`
-            WHERE user = {frappe.db.escape(user)}
-        )
-    """
-		else:
-			return "1=0" 
+	# if "QF Technician" in frappe.get_roles(user):
+	# 	technician_names = frappe.get_all(
+    #         "Technician",
+    #         filters={"user": user},
+    #         pluck="name"
+    #     )
+	# 	if technician_names:
+	# 		return f"""
+    #     `tabJob Card`.assigned_technician IN (
+    #         SELECT name FROM `tabTechnician`
+    #         WHERE user = {frappe.db.escape(user)}
+    #     )
+    # """
+	# 	else:
+	# 		return "1=0" 
         
 	

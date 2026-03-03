@@ -9,9 +9,9 @@ class ServiceInvoice(Document):
 	pass
 
 def has_permission(doc,user):
-	if user=="Administrator":
+	if user=="priyashanmugasundaram2005@gmail.com":
 		return True
 	
-	if not "QF Manager" in frappe.get_roles(user):
-		if doc.payment_status!='Paid':
-			return False
+	# if not "QF Manager" in frappe.get_roles(user):
+	# 	if doc.payment_status!='Paid':
+	# 		return False

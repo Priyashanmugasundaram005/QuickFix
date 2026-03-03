@@ -47,6 +47,8 @@ frappe.ui.form.on("Job Card", {
             frm.page.set_title(
                 `Shop : ${name}`
             )
+
+
         // frm.page.set_indicator(
         //         __("Shop: {0}", [frappe.boot.quickfix_shop_name]),
         //         "blue"
@@ -76,25 +78,48 @@ frappe.ui.form.on("Job Card", {
     if (frm.doc.docstatus !=1){
     frm.add_custom_button("Transfer Technician",()=>
     {
+        
         frappe.prompt([{
 
             label: 'New Technician',
             fieldname: 'new',
             fieldtype: 'Link',
             options:'Technician',
-            reqd:1
+            reqd:1,
+            get_query:() => {
+                    return {
+                        filters: {
+                            specialization:frm.doc.device_type
 
-        }],(values)=>{
+                        }
+
+                    }
+                }
+
+            }
+
+        ],(values)=>{
             frappe.confirm("Do you need to proceed with this Technician",()=>{
                 frm.trigger('assigned_technician')
                 frm.call('new_tech',{new_technician:values.new})
             })
         }
     )
-    })}
+    }
 
 
-    },
+)}
+
+// if (!frappe.user.has_role("System Manager")) {                    // Shipped JS
+//             console.log("App JS Loaded");
+//             frm.toggle_display('customer_phone', false);
+//         } else {
+//             frm.toggle_display('customer_phone', true);
+//         }
+
+
+
+},
     status: add_color,
     onload(frm) {
         console.log("innn")

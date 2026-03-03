@@ -105,12 +105,12 @@ def install():
     print("Successfully Executed after_install hook")
 
 def make_remarks():
-    frappe.make_property_setter(
-        doctype="Job Card",
-        fieldname="remarks",
-        property="bold",
-        value=1,
-        property_type="check")
+    frappe.make_property_setter({
+        "doctype":"Job Card",
+        "fieldname":"remarks",
+        "property":"bold",
+        "value":1,
+        "property_type":"check"})
 
 
 def before_uninstall():

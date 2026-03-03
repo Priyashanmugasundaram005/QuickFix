@@ -496,7 +496,6 @@ Run this command after:
 * Use **override_whitelisted_methods** for production-safe customization.
 * Use monkey patching only for temporary debugging or experiments.
 
----
 
 ### ⚠️ Multiple Apps Overriding Same Method
 
@@ -520,9 +519,7 @@ If arguments differ, Frappe cannot map parameters → **TypeError**.
 
 **Example Error**
 
-```
 TypeError: custom_get_count() missing required positional argument 'doctype'
-```
 
 **When it occurs**
 
@@ -660,27 +657,45 @@ doctype_tree_js = {
     "Account": "public/js/account_tree.js"
 }
 
-Uses
-
+**Uses**
 Custom buttons
-
 Expand/collapse control
-
 Node UI customization
 
-How Tree Works
-
+**How Tree Works**
 Root nodes load first
-
 Children load on expand
-
 is_group shows expand icon
 
-Common Errors
-
+**Common Errors**
 Missing is_group → no expand
-
 Wrong parent field → broken hierarchy
-
 Using list JS → no effect
 
+### Client Script DocType vs Shipped JS
+
+**Client Script**
+Created from Desk (stored in DB)
+Used for quick UI changes
+Not version controlled
+Risky for large production apps
+
+**Shipped JS (App Level)**
+Stored inside custom app
+Version controlled (Git)
+Better for maintainable and scalable projects
+Recommended for production
+
+### Hiding Field vs Security
+**Hiding with JS**
+frm.set_df_property("customer_phone", "hidden", 1);
+Only hides in UI
+Data still accessible via API
+Not secure
+
+**Proper Security**
+Use Role Permission Manager
+Field-level permissions
+Server-side validation (Python)
+
+👉 Always enforce security on server side.

@@ -69,8 +69,16 @@ def manager_action():
 @frappe.whitelist(allow_guest=True)
 def custom_get_count(doctype, filters=None, debug=False, cache=False):
     # Log API usage
-    frappe.msgprint("Override is running")
+    # frappe.msgprint("Override is running")
+    print("doneeeeeeeee")
     create_audit_log(doctype_name=doctype, action="count_queried")
+    # todo = frappe.get_doc({"doctype":"ToDo", "description": "test"})
+    # print(todo)
+    # todo.insert(ignore_permissions=True)
+    # print(todo)
+    # frappe.db.commit()
+    print("11111111111111111111")
+    
 
     # Call original behavior
     return get_count(doctype, filters, debug, cache)

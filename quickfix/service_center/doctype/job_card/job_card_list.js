@@ -9,6 +9,7 @@ frappe.listview_settings['Job Card'] = {
         "Delivered": "green",
         "Cancelled": "red"
     },
+    has_indicator_for_draft: true,
 
     get_indicator(doc) {
         if (doc.status) {

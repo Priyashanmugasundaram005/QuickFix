@@ -32,6 +32,7 @@ class CustomJobCard(JobCard):
 
 
 def create_audit_log(doctype_name, document_name=None, action="api_call"):
+    frappe.log_error("audittttt")
     frappe.get_doc({
         "doctype": "Audit Log",
         "doctype_name": doctype_name,
@@ -40,6 +41,7 @@ def create_audit_log(doctype_name, document_name=None, action="api_call"):
         "user": frappe.session.user,
         "timestamp": nowdate(),
     }).insert(ignore_permissions=True)
+    frappe.db.commit()
 
 def log(doc, method):
     allowed = [

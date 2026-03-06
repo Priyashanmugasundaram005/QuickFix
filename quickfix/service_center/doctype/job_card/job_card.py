@@ -80,6 +80,8 @@ class JobCard(Document):
 	def end_job_ready_email(self):
 		frappe.log_error("maill",self.customer_email)
 		frappe.enqueue(method=self.mail,queue="short",customer_email=[self.customer_email])
+
+		self.status="Delivered"
 		
 
 

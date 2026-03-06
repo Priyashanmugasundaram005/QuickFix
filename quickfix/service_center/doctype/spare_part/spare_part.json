@@ -11,7 +11,7 @@
   "unit_cost",
   "selling_price",
   "stock_qty",
-  "render_level",
+  "reorder_level",
   "is_active"
  ],
  "fields": [
@@ -54,22 +54,22 @@
    "label": "Stock Qty"
   },
   {
-   "default": "5",
-   "fieldname": "render_level",
-   "fieldtype": "Float",
-   "label": "Render Level"
-  },
-  {
    "default": "1",
    "fieldname": "is_active",
    "fieldtype": "Check",
    "label": "Is Active"
+  },
+  {
+   "default": "5",
+   "fieldname": "reorder_level",
+   "fieldtype": "Float",
+   "label": "Reorder Level"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-28 15:49:40.257873",
+ "modified": "2026-03-04 16:44:37.299768",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Spare Part",

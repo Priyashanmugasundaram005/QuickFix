@@ -15,13 +15,14 @@ def execute(filters=None):
 	if ft and to:
 		base_filters['creation']=['between',[ft,to]]
 
-
 	columns = [
 
 		{
 			'fieldname': 'technician',
 			'label': ('Technician'),
-			'fieldtype': 'Data'
+			'fieldtype': 'Link',
+			'options':'Technician',
+			'width':150
 		},
 		{
 			'fieldname': 'total_jobs',
@@ -41,12 +42,14 @@ def execute(filters=None):
 		{
 			'fieldname': 'revenue',
 			'label': ('Revenue'),
-			'fieldtype': 'Currency'
+			'fieldtype': 'Currency',
+			'width':150
 		},
 		{
 			'fieldname': 'completion_rate',
 			'label': ('Completion Rate %'),
-			'fieldtype': 'Float'
+			'fieldtype': 'Percentage',
+			"precision": 2
 		},
 	]
 
@@ -58,7 +61,6 @@ def execute(filters=None):
 
 		})
 
-
 	data=[]
 	if technician:
 		technician_list=[technician]
@@ -69,7 +71,7 @@ def execute(filters=None):
 
 		base_filters["assigned_technician"] = tech
 		
-		jobs=frappe.db.get_all("Job Card",filters=base_filters,fields=['name','status','creation','delivery_date','device_type','labour_charge'])
+		jobs=frappe.db.get_list("Job Card",filters=base_filters,fields=['name','status','creation','delivery_date','device_type','labour_charge'])
 		total=len(jobs)
 		rev=0
 		comp=0
@@ -103,13 +105,58 @@ def execute(filters=None):
 				'completed':comp,
 				'revenue':rev,
 				'avg_turn_day':round(avg,2),
-				'completion_rate':round(completion_rate,2),	
-			
+				'completion_rate':round(completion_rate,2),
 		}
 
 		frappe.log_error("lpoiuytfv",device_counts)
 		row.update(device_counts)
 		data.append(row)
 
+		labels = []
+		total_list = []
+		completed_list = []
+		revenue=[]
+		best=None,
+		max=0
+
+		for r in data:
+			labels.append(r.get("technician"))
+			total_list.append(r.get("total_jobs"))
+			completed_list.append(r.get("completed"))
+			revenue.append(r.get("revenue"))
+			if r.get("total_jobs",0)>max:
+				max=r.get("total_jobs")
+				best=r.get("technician")
+
+
+
+		chart={
+			'title':"Total vs Completed per technician",
+			'data':{
+				'labels':labels,
+				'datasets':[{
+					'name':"Total",
+					'values':total_list
+				},
+				{
+					'name':"Completed Jobs",
+					'values':completed_list	
+				},
+				]
+			},
+			'type': 'bar', 
+			'height': 300,
+		}
+		tot= sum(total_list)
+		reve=sum(revenue)
 		
-	return columns, data
+		
+
+		summary=[
+			{'label': 'Total Jobs', 'value': tot, 'datatype': 'Int'},
+			{'label': 'Total Revenues', 'value': reve, 'datatype': 'Currency'},
+			{'label': 'Best Technician', 'value': best, 'datatype': 'Data'}
+
+		]
+
+	return columns, data, None, chart,summary

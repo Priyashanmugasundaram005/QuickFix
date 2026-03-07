@@ -82,3 +82,10 @@ def custom_get_count(doctype, filters=None, debug=False, cache=False):
 
     # Call original behavior
     return get_count(doctype, filters, debug, cache)
+
+
+
+
+@frappe.whitelist()
+def get_shop_name():
+    return frappe.db.get_single_value("QuickFix Settings", "shop_name")

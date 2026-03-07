@@ -20,6 +20,7 @@
   "assigned_technician",
   "diagnosis_notes",
   "estimated_cost",
+  "company",
   "diagnosis_date",
   "priority",
   "parts_used_section",
@@ -152,7 +153,8 @@
    "allow_on_submit": 1,
    "fieldname": "labour_charge",
    "fieldtype": "Currency",
-   "label": "Labour Charge"
+   "label": "Labour Charge",
+   "options": "INR"
   },
   {
    "fieldname": "final_amount",
@@ -193,13 +195,20 @@
   {
    "fieldname": "column_break_qvue",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-04 11:27:30.465135",
+ "modified": "2026-03-06 15:38:05.105657",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

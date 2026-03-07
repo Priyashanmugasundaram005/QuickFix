@@ -8,12 +8,13 @@ frappe.query_reports["Spare Parts Inventory"] = {
 
 	formatter:function(value,row,column,data,default_formatter){
 		value=default_formatter(value,row,column,data)
-		if (column.fieldname=='st_qty' && data){
-			if(data.st_qty<=data.reorder_level){
-				value = `<span style="color:red">${value}</span>`;
+		
+			if(data && data.st_qty<=Number(data.reorder_lvl)){
+				console.log("88888")
+				return `<span style="background-color:#ffcccc;display:block;">${value}</span>`;
 			}
 
-		}
+		
 		return value
 			
 	}

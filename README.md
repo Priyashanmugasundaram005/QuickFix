@@ -655,7 +655,7 @@ Used to add custom JS for **Tree View only**.
 ```python
 doctype_tree_js = {
     "Account": "public/js/account_tree.js"
-}
+}```
 
 **Uses**
 Custom buttons
@@ -699,3 +699,43 @@ Field-level permissions
 Server-side validation (Python)
 
 👉 Always enforce security on server side.
+
+## Jinja Data Fetching Patterns in Frappe Print Formats
+
+### 1. Using `frappe.get_all()` Directly in Jinja
+
+You can fetch data directly inside the Jinja template using `frappe.get_all()`.
+
+Example:
+
+```jinja
+{% set parts = frappe.get_all("Parts", filters={"job_card": doc.name}, fields=["part_name","quantity"]) %}
+
+{% for part in parts %}
+<tr>
+<td>{{ part.part_name }}</td>
+<td>{{ part.quantity }}</td>
+</tr>
+{% endfor %}```
+
+### Pre-compute Data in before_print() 
+
+Instead of querying inside the template, fetch the required data in the controller using before_print() and attach it to the document.
+
+***Controller Example***
+
+def before_print(self):
+    self.precomputed_parts = frappe.get_all(
+        "Parts",
+        filters={"job_card": self.name},
+        fields=["part_name", "quantity"]
+    )
+
+**Template Usage**
+
+{% for part in doc.precomputed_parts %}
+<tr>
+<td>{{ part.part_name }}</td>
+<td>{{ part.quantity }}</td>
+</tr>
+{% endfor %}

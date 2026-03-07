@@ -652,6 +652,7 @@ A **Tree DocType** stores hierarchical data (parent → child) in an expandable 
 Used to add custom JS for **Tree View only**.
 
 ### hooks.py
+
 ```python
 doctype_tree_js = {
     "Account": "public/js/account_tree.js"

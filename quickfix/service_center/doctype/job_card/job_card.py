@@ -13,6 +13,7 @@ class JobCard(Document):
 	@frappe.whitelist()
 	def validate(self):
 		total=0
+		self.company=self.final_amount
 		frappe.log_error("111")
 		if self.customer_phone:
 			frappe.log_error("2222",self.customer_phone)
@@ -51,6 +52,7 @@ class JobCard(Document):
 			stock=frappe.get_value("Spare Part",row.part,['stock_qty'])
 			if stock<row.quantity:
 				frappe.throw("Stock unavailable")
+		self.status="Delivered"
 
 
 	def on_submit(self):
@@ -81,7 +83,7 @@ class JobCard(Document):
 		frappe.log_error("maill",self.customer_email)
 		frappe.enqueue(method=self.mail,queue="short",customer_email=[self.customer_email])
 
-		self.status="Delivered"
+		
 		
 
 
@@ -124,6 +126,9 @@ class JobCard(Document):
 	def new_tech(self,new_technician):
 		frappe.log_error(new_technician)
 		self.assigned_technician=new_technician
+
+	def before_print(self,print_settings=None):
+   		self.print_summary = f"{self.customer_name} - {self.device_type} {self.device_model}"	
 
 
 

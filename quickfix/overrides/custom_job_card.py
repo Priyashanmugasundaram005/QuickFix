@@ -135,4 +135,31 @@ def extend_bootinfo(bootinfo):
     bootinfo.quickfix_manager_email = settings.manager_email
 
 
+
+
+
+
+@frappe.whitelist()
+def get_status_chart_data():
+    data = frappe.db.sql("""
+        SELECT status, COUNT(*) as count
+        FROM `tabJob Card`
+        GROUP BY status
+    """, as_dict=True)
+
+    labels = []
+    values = []
+
+    for d in data:
+        labels.append(d.status)
+        values.append(d.count)
+
+    return {
+        "labels": labels,
+        "datasets": [
+            {"name": "Jobs", "values": values}
+        ]
+    }
+
+
     

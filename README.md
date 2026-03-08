@@ -652,6 +652,7 @@ A **Tree DocType** stores hierarchical data (parent → child) in an expandable 
 Used to add custom JS for **Tree View only**.
 
 ### hooks.py
+
 ```python
 doctype_tree_js = {
     "Account": "public/js/account_tree.js"
@@ -671,6 +672,8 @@ is_group shows expand icon
 Missing is_group → no expand
 Wrong parent field → broken hierarchy
 Using list JS → no effect
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### Client Script DocType vs Shipped JS
 
@@ -739,3 +742,90 @@ def before_print(self):
 <td>{{ part.quantity }}</td>
 </tr>
 {% endfor %}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Raw Printing vs HTML to PDF in Frappe
+
+### 1. Raw Printing (ESC/POS)
+
+Raw printing sends **printer control commands directly to the printer**.  
+Thermal printers commonly use **ESC/POS commands**.
+
+Characteristics:
+- No HTML rendering
+- No CSS support
+- Direct communication with the printer
+- Very fast and lightweight
+- Typically used for **80mm receipt printers**
+
+Example use case:
+Retail stores printing **POS receipts** directly to a thermal printer.
+
+---
+
+### 2. HTML → PDF Rendering (WeasyPrint)
+
+Frappe normally generates print formats as **HTML**, which are then converted to **PDF using WeasyPrint**.
+
+Process:
+1. Jinja template generates HTML
+2. CSS styling is applied
+3. WeasyPrint converts the HTML to a PDF document
+
+Characteristics:
+- Supports many HTML/CSS features
+- Slower than raw printing
+- Good for **invoices, job cards, reports**
+- Produces high-quality printable documents
+
+---
+
+## CSS That Works in Browsers but Fails in WeasyPrint
+
+Some CSS features supported by modern browsers do **not work correctly in WeasyPrint**.
+
+Examples:
+
+1. `position: sticky`
+2. `flexbox gap property`
+3. `backdrop-filter`
+
+These may render correctly in Chrome but **fail or behave incorrectly in generated PDFs**.
+
+---
+
+## Thermal Print Format (80mm)
+
+Thermal printers use **narrow paper widths**, typically **80mm**.  
+The print format must be **minimal and compact**.
+
+Displayed fields:
+- Job Number
+- Customer Name
+- Total Amount
+
+---
+
+## Why Use format_value()
+
+`format_value()` ensures numbers are displayed using the **correct currency and locale formatting**.
+
+Example without formatting:
+
+{{ doc.final_amount }}
+
+Output might appear as:
+2500
+
+Example using formatting:
+
+{{ format_value(doc.final_amount, "Currency") }}
+
+Output becomes:
+$ 2,500.00
+
+Benefits:
+- Correct currency symbol
+- Proper decimal places
+- Locale-aware formatting

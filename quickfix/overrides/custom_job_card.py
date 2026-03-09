@@ -1,6 +1,6 @@
 from quickfix.service_center.doctype.job_card.job_card import JobCard
 import frappe
-from frappe.utils import nowdate
+from frappe.utils import nowdate,today
 
 
 
@@ -33,21 +33,23 @@ class CustomJobCard(JobCard):
 
 def create_audit_log(doctype_name, document_name=None, action="api_call"):
     frappe.log_error("audittttt")
-    frappe.get_doc({
-        "doctype": "Audit Log",
-        "doctype_name": doctype_name,
-        "document_name": document_name,
-        "action": action,
-        "user": frappe.session.user,
-        "timestamp": nowdate(),
-    }).insert(ignore_permissions=True)
+    audit=frappe.new_doc("Audit Log")
+    audit.doctype_name = doctype_name
+    audit.document_name=document_name
+    if doctype_name=="Scheduled Job Log":
+        audit.action="low_stock_check"
+    else:
+        audit.action=action
+    audit.user=frappe.session.user
+    audit.timestamp= nowdate()
+    audit.insert(ignore_permissions=True)
     frappe.db.commit()
 
 def log(doc, method):
     allowed = [
         'Technician', 'Device Type', 'Spare Part',
         'Job Card', 'QuickFix Settings',
-        'Service Invoice', 'Part Usage Entry'
+        'Service Invoice', 'Part Usage Entry',"Scheduled Job Log"
     ]
 
     if doc.doctype not in allowed:
@@ -160,6 +162,56 @@ def get_status_chart_data():
             {"name": "Jobs", "values": values}
         ]
     }
+
+def check_low_stock():
+    last_run = frappe.db.get_value("Audit Log",
+    {"action":"low_stock_check","timestamp":today()}, "name")
+    if last_run:
+        return
+    low_stock = frappe.db.sql("""
+    SELECT name, stock_qty, reorder_level
+    FROM `tabSpare Part`
+    WHERE stock_qty < reorder_level
+    """, as_dict=True)
+
+    html_template = """
+        <h3>Low Stock Alert</h3>
+        <p>The following spare parts are below reorder level:</p>
+
+        <table border="1" cellpadding="6" cellspacing="0">
+            <tr>
+                <th>Part</th>
+                <th>Stock Qty</th>
+                <th>Reorder Level</th>
+            </tr>
+
+            {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.stock_qty }}</td>
+                <td>{{ item.reorder_level }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <p>Please restock these items.</p>
+        """
+
+    message = frappe.render_template(html_template, {"items": low_stock})
+
+    if low_stock:
+        mail=frappe.get_single_value("QuickFix Settings",'manager_email')
+        frappe.sendmail(recipients=[mail],subject="Low Stock Alert",message=message)
+    
+   
+
+
+
+
+
+    
+        
 
 
     

@@ -100,7 +100,8 @@
    "fieldname": "assigned_technician",
    "fieldtype": "Link",
    "label": "Assigned Technician",
-   "options": "Technician"
+   "options": "Technician",
+   "search_index": 1
   },
   {
    "depends_on": "eval:doc.assigned_technician",
@@ -186,7 +187,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Pending Diagnosis\nAwaiting Customer Approval\nIn Repair\nReady for Delivery\nDelivered\nCancelled"
+   "options": "Draft\nPending Diagnosis\nAwaiting Customer Approval\nIn Repair\nReady for Delivery\nDelivered\nCancelled",
+   "search_index": 1
   },
   {
    "fieldname": "column_break_ccai",
@@ -206,7 +208,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-09 12:31:19.947479",
+ "modified": "2026-03-09 22:13:56.698456",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

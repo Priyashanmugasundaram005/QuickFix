@@ -6,23 +6,30 @@ from frappe.utils import date_diff
 
 
 def execute(filters=None):
-	ft=filters.get("from_date")
-	to=filters.get("to_date")
-	technician=filters.get("technician")
-	base_filters={}
+
+	ft = filters.get("from_date")
+	to = filters.get("to_date")
+	technician = filters.get("technician")
+
+	conditions = ""
+	values = {}
+
 	if technician:
-		base_filters["assigned_technician"] = technician
+		conditions += " AND assigned_technician = %(technician)s"
+		values["technician"] = technician
+
 	if ft and to:
-		base_filters['creation']=['between',[ft,to]]
+		conditions += " AND creation BETWEEN %(from_date)s AND %(to_date)s"
+		values["from_date"] = ft
+		values["to_date"] = to
 
 	columns = [
-
 		{
 			'fieldname': 'technician',
 			'label': ('Technician'),
 			'fieldtype': 'Link',
-			'options':'Technician',
-			'width':150
+			'options': 'Technician',
+			'width': 150
 		},
 		{
 			'fieldname': 'total_jobs',
@@ -43,7 +50,7 @@ def execute(filters=None):
 			'fieldname': 'revenue',
 			'label': ('Revenue'),
 			'fieldtype': 'Currency',
-			'width':150
+			'width': 150
 		},
 		{
 			'fieldname': 'completion_rate',
@@ -53,110 +60,120 @@ def execute(filters=None):
 		},
 	]
 
-	device=frappe.get_all("Device Type",pluck='name')
+	device = frappe.get_all("Device Type", pluck='name')
+
 	for dev in device:
 		columns.append({
-			'label': (dev),
+			'label': dev,
+			'fieldname': dev.lower(),
 			'fieldtype': 'Int'
-
 		})
 
-	data=[]
-	if technician:
-		technician_list=[technician]
-	else:
-		technician_list=frappe.get_all("Technician",pluck='name')
+	# Single optimized SQL query
+	jobs = frappe.db.sql(f"""
+		SELECT
+			assigned_technician,
+			device_type,
+			status,
+			creation,
+			delivery_date,
+			IFNULL(labour_charge,0) AS labour_charge
+		FROM `tabJob Card`
+		WHERE 1=1 {conditions}
+	""", values, as_dict=True)
 
-	for tech in technician_list:
+	data_map = {}
 
-		base_filters["assigned_technician"] = tech
-		
-		jobs=frappe.db.get_list("Job Card",filters=base_filters,fields=['name','status','creation','delivery_date','device_type','labour_charge'])
-		total=len(jobs)
-		rev=0
-		comp=0
-		turnar=0
-		device_counts = {dev.lower(): 0 for dev in device}
-		frappe.log_error("devvv",device_counts)
+	for job in jobs:
 
-		for job in jobs:
-			frappe.log_error("helooooo",job.device_type)
+		tech = job.assigned_technician
+
+		if tech not in data_map:
+			data_map[tech] = {
+				'technician': tech,
+				'total_jobs': 0,
+				'completed': 0,
+				'revenue': 0,
+				'turnaround': 0,
+				**{dev.lower():0 for dev in device}
+			}
+
+		row = data_map[tech]
+
+		row['total_jobs'] += 1
+		row['revenue'] += job.labour_charge
+
+		if job.status == "Ready for Delivery":
+			row['completed'] += 1
+
+		if job.delivery_date:
+			row['turnaround'] += date_diff(job.delivery_date, job.creation)
+
+		if job.device_type and job.device_type.lower() in row:
+			row[job.device_type.lower()] += 1
 
 
-			if job.device_type.lower() in device_counts:
-				frappe.log_error("helooooo",job.device_type)
-				device_counts[job.device_type.lower()] += 1
-				
-			rev+=job.labour_charge or 0
-			if job.status=='Ready for Delivery':
-				comp+=1
+	data = []
 
-			if job.delivery_date:
-				turnar+=date_diff(job.delivery_date,job.creation)
-		
-		avg=(turnar/comp if comp else 0)
-		
-		completion_rate = (comp / total )*100 if total else 0
+	for tech, row in data_map.items():
 
-		row={
-			
-				'technician':tech,
-				'total_jobs':total,
-				'completed':comp,
-				'revenue':rev,
-				'avg_turn_day':round(avg,2),
-				'completion_rate':round(completion_rate,2),
-		}
+		comp = row['completed']
+		total = row['total_jobs']
 
-		frappe.log_error("lpoiuytfv",device_counts)
-		row.update(device_counts)
+		avg = row['turnaround'] / comp if comp else 0
+		completion_rate = (comp / total) * 100 if total else 0
+
+		row['avg_turn_day'] = round(avg,2)
+		row['completion_rate'] = round(completion_rate,2)
+
+		del row['turnaround']
+
 		data.append(row)
 
-		labels = []
-		total_list = []
-		completed_list = []
-		revenue=[]
-		best=None,
-		max=0
+	labels = []
+	total_list = []
+	completed_list = []
+	revenue = []
 
-		for r in data:
-			labels.append(r.get("technician"))
-			total_list.append(r.get("total_jobs"))
-			completed_list.append(r.get("completed"))
-			revenue.append(r.get("revenue"))
-			if r.get("total_jobs",0)>max:
-				max=r.get("total_jobs")
-				best=r.get("technician")
+	best = None
+	max_jobs = 0
 
+	for r in data:
+		labels.append(r.get("technician"))
+		total_list.append(r.get("total_jobs"))
+		completed_list.append(r.get("completed"))
+		revenue.append(r.get("revenue"))
 
+		if r.get("total_jobs",0) > max_jobs:
+			max_jobs = r.get("total_jobs")
+			best = r.get("technician")
 
-		chart={
-			'title':"Total vs Completed per technician",
-			'data':{
-				'labels':labels,
-				'datasets':[{
-					'name':"Total",
-					'values':total_list
+	chart = {
+		'title': "Total vs Completed per technician",
+		'data': {
+			'labels': labels,
+			'datasets': [
+				{
+					'name': "Total",
+					'values': total_list
 				},
 				{
-					'name':"Completed Jobs",
-					'values':completed_list	
+					'name': "Completed Jobs",
+					'values': completed_list
 				},
-				]
-			},
-			'type': 'bar', 
-			'height': 300,
-		}
-		tot= sum(total_list)
-		reve=sum(revenue)
-		
-		
+			]
+		},
+		'type': 'bar',
+		'height': 300,
+	}
 
-		summary=[
-			{'label': 'Total Jobs', 'value': tot, 'datatype': 'Int'},
-			{'label': 'Total Revenues', 'value': reve, 'datatype': 'Currency'},
-			{'label': 'Best Technician', 'value': best, 'datatype': 'Data'}
+	tot = sum(total_list)
+	reve = sum(revenue)
 
-		]
+	summary = [
+		{'label': 'Total Jobs', 'value': tot, 'datatype': 'Int'},
+		{'label': 'Total Revenues', 'value': reve, 'datatype': 'Currency'},
+		{'label': 'Best Technician', 'value': best, 'datatype': 'Data'}
+	]
 
-	return columns, data, None, chart,summary
+	return columns, data, None, chart, summary

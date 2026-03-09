@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import now_datetime, add_days,nowdate, add_months
+from frappe.utils import now_datetime, add_days,nowdate, add_months,now
 
 from datetime import datetime
 from frappe.query_builder import DocType
@@ -141,3 +141,49 @@ def monthly_revenue():
         subject="Monthly Revenue Report",
         message=message
     )
+
+
+@frappe.whitelist(allow_guest=True)
+def cancel_old_draft_job_cards():
+    start=time.time()
+    frappe.db.sql("""
+        UPDATE `tabJob Card`
+        SET status = 'Cancelled'
+        WHERE status = 'Draft
+        ORDER BY creation ASC
+        LIMIT 1000
+    """)
+
+    frappe.db.commit()
+    end=time.time()
+    print("Insert Time:", end - start)
+
+
+
+
+@frappe.whitelist(allow_guest=True)
+def bulk_insert():
+
+    records = []
+
+    for i in range(1000):
+        records.append((
+            frappe.generate_hash(),
+            "Administrator",
+            "bulk_cancel",
+            now()
+        ))
+
+    frappe.db.bulk_insert(
+        "Audit Log",
+        ["name", "user", "action", "timestamp"],
+        records,
+        ignore_duplicates=False
+    )
+
+    frappe.db.commit()
+
+@frappe.whitelist(allow_guest=True)
+def update():
+    pass
+

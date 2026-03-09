@@ -720,7 +720,10 @@ You can fetch data directly inside the Jinja template using `frappe.get_all()`.
 <td>{{ part.part_name }}</td>
 <td>{{ part.quantity }}</td>
 </tr>
-{% endfor %}```
+{% endfor %}
+```
+
+
 
 ### Pre-compute Data in before_print() 
 
@@ -864,3 +867,40 @@ On development sites, scheduled jobs may:
 - Interfere with testing
 
 Disabling the scheduler ensures that background jobs do not run automatically during development.
+
+## N+1 Query Problem and Fix
+
+### Problem
+The code fetches all **Job Cards** and then runs another query for each **Technician** using `frappe.get_doc()`.  
+This causes **N+1 queries** (1 query for Job Cards + N queries for Technicians), which reduces performance.
+
+### Fix
+Fetch data using a **single query with a join**.
+
+```python
+data = frappe.db.sql("""
+SELECT jc.name, t.technician_name, t.phone
+FROM `tabJob Card` jc
+LEFT JOIN `tabTechnician` t
+ON jc.assigned_technician = t.name
+""", as_dict=True)
+
+### Bulk operations
+
+***Update***
+Normal Update Time: 1.1649196147918701
+Bulk Update Time: 0.003966093063354492
+
+***Insert***
+Normal Insert Time: 6.59688925743103
+Bulk Insert Time: 0.09565520286560059
+
+### Why Not Index Every Field?
+
+Indexes speed up read queries, but they also have costs:
+
+Slower writes: Insert, update, and delete operations become slower because indexes must also be updated.
+More storage usage: Each index consumes additional database space.
+Maintenance overhead: Too many indexes can reduce overall database performance.
+Therefore,indexes should only be added to fields frequently used in filters, joins, or search operations.
+

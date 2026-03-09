@@ -1,7 +1,7 @@
 # Copyright (c) 2026, priii and contributors
 # For license information, please see license.txt
 
-# import frappe
+
 import frappe
 from frappe.model.document import Document
 import re
@@ -56,7 +56,9 @@ class JobCard(Document):
 
 
 	def on_submit(self):
-		self.end_job_ready_email()
+		frappe.enqueue(
+		method=self.send_job_ready_email,
+		queue="short")
 		for part in self.parts_used:
 			current=frappe.db.get_value("Spare Part",part,'stock_qty')or 0
 			#  We use frappe.db.set_value for stock deduction because this is asystem-initiated update during document submission.
@@ -79,7 +81,7 @@ class JobCard(Document):
 		frappe.log_error("customer_emailllllllll",customer_email)
 		frappe.sendmail(recipients=customer_email,message="Your job is ready")
 
-	def end_job_ready_email(self):
+	def send_job_ready_email(self):
 		frappe.log_error("maill",self.customer_email)
 		frappe.enqueue(method=self.mail,queue="short",customer_email=[self.customer_email])
 
@@ -125,10 +127,24 @@ class JobCard(Document):
 	@frappe.whitelist()
 	def new_tech(self,new_technician):
 		frappe.log_error(new_technician)
+		frappe.enqueue(
+		method=self.send_job_ready_email,
+		queue="short")
 		self.assigned_technician=new_technician
 
 	def before_print(self,print_settings=None):
    		self.print_summary = f"{self.customer_name} - {self.device_type} {self.device_model}"	
+
+	
+
+	# def generate_monthly_revenue_report(self,year):
+	# 	months = range(1, 13)
+	# 	for i, month in enumerate(months, 1):
+	# 		frappe.publish_progress(
+	# 		percent=round(i/12*100),
+	# 		title="Generating Revenue Report",
+	# 		description=f"Processing month {month}..."
+	# 		)
 
 
 

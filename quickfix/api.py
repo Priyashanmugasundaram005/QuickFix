@@ -1,5 +1,7 @@
 import frappe
-from frappe.utils import now_datetime, add_days
+from frappe.utils import now_datetime, add_days,nowdate, add_months
+
+from datetime import datetime
 from frappe.query_builder import DocType
 from frappe.client import get_count
 from quickfix.overrides.custom_job_card import create_audit_log
@@ -89,3 +91,53 @@ def custom_get_count(doctype, filters=None, debug=False, cache=False):
 @frappe.whitelist()
 def get_shop_name():
     return frappe.db.get_single_value("QuickFix Settings", "shop_name")
+
+
+def monthly_revenue():
+
+    revenue = frappe.db.sql("""
+        SELECT SUM(final_amount) as revenue
+        FROM `tabJob Card`
+        WHERE status='Delivered'
+        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+    """, as_dict=True)[0].revenue or 0
+
+    manager = frappe.get_single_value("QuickFix Settings", "manager_email")
+
+    html_template = """
+    <h2>Monthly Revenue Report</h2>
+
+    <p>The revenue for the previous month is:</p>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <tr>
+            <th>Month</th>
+            <th>Total Revenue</th>
+        </tr>
+
+        <tr>
+            <td>{{ month }}</td>
+            <td>{{ revenue }}</td>
+        </tr>
+    </table>
+
+    <br>
+    <p>This report was generated automatically by QuickFix.</p>
+    """
+
+    prev_month = datetime.strptime(add_months(nowdate(), -1), "%Y-%m-%d").strftime("%B %Y")
+
+
+    message = frappe.render_template(
+        html_template,
+        {
+            "month": prev_month,
+            "revenue": revenue
+        }
+    )
+
+    frappe.sendmail(
+        recipients=[manager],
+        subject="Monthly Revenue Report",
+        message=message
+    )

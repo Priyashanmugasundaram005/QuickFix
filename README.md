@@ -656,7 +656,8 @@ Used to add custom JS for **Tree View only**.
 ```python
 doctype_tree_js = {
     "Account": "public/js/account_tree.js"
-}```
+}
+```
 
 **Uses**
 Custom buttons
@@ -709,7 +710,7 @@ Server-side validation (Python)
 
 You can fetch data directly inside the Jinja template using `frappe.get_all()`.
 
-Example:
+***Example:***
 
 ```jinja
 {% set parts = frappe.get_all("Parts", filters={"job_card": doc.name}, fields=["part_name","quantity"]) %}
@@ -752,7 +753,7 @@ def before_print(self):
 Raw printing sends **printer control commands directly to the printer**.  
 Thermal printers commonly use **ESC/POS commands**.
 
-Characteristics:
+***Characteristics:***
 - No HTML rendering
 - No CSS support
 - Direct communication with the printer
@@ -768,12 +769,12 @@ Retail stores printing **POS receipts** directly to a thermal printer.
 
 Frappe normally generates print formats as **HTML**, which are then converted to **PDF using WeasyPrint**.
 
-Process:
+***Process:***
 1. Jinja template generates HTML
 2. CSS styling is applied
 3. WeasyPrint converts the HTML to a PDF document
 
-Characteristics:
+***Characteristics:***
 - Supports many HTML/CSS features
 - Slower than raw printing
 - Good for **invoices, job cards, reports**
@@ -785,7 +786,7 @@ Characteristics:
 
 Some CSS features supported by modern browsers do **not work correctly in WeasyPrint**.
 
-Examples:
+***Examples:***
 
 1. `position: sticky`
 2. `flexbox gap property`
@@ -800,7 +801,7 @@ These may render correctly in Chrome but **fail or behave incorrectly in generat
 Thermal printers use **narrow paper widths**, typically **80mm**.  
 The print format must be **minimal and compact**.
 
-Displayed fields:
+***Displayed fields:***
 - Job Number
 - Customer Name
 - Total Amount
@@ -825,7 +826,41 @@ Example using formatting:
 Output becomes:
 $ 2,500.00
 
-Benefits:
+***Benefits:***
 - Correct currency symbol
 - Proper decimal places
 - Locale-aware formatting
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+## Background Jobs: Queues
+
+### short queue
+Used for very quick tasks that finish within a few seconds.  
+Examples: sending notifications, small updates, triggering lightweight events.
+
+### default queue
+Used for normal background tasks that take moderate time to complete.  
+Examples: report generation, email sending, moderate data processing.
+
+### long queue
+Used for heavy or time-consuming operations.  
+Examples: large data imports, backups, bulk updates, complex calculations.
+
+### Why Multiple Queues?
+
+Using separate queues ensures that **long-running tasks do not delay quick operations**, improving overall system performance and responsiveness.
+
+### Disabling Scheduler for a Specific Site
+
+The scheduler can be disabled for a site using the command:
+
+bench --site sitename set-config pause_scheduler 1
+
+### Why Disable Scheduler on a Dev Site?
+
+On development sites, scheduled jobs may:
+- Send unwanted emails or notifications
+- Consume system resources
+- Interfere with testing
+
+Disabling the scheduler ensures that background jobs do not run automatically during development.

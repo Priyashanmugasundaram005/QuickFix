@@ -1009,7 +1009,7 @@ Endpoints in Frappe with `allow_guest=True` allow **unauthenticated access**, wh
 3. **Unauthorized Actions** – If endpoint logic allows data modification, attackers can potentially manipulate records or perform actions without authentication.  
 
 
-## Server Script Analysis (Short)
+## Server Script Analysis
 
 **Blocked Functions/Modules:** `os.system`, `subprocess`, `eval/exec`, `open()`
 
@@ -1028,3 +1028,4 @@ Endpoints in Frappe with `allow_guest=True` allow **unauthenticated access**, wh
 
 **Governance/Maintainability Risk:**  
 - Hidden logic, no version control, performance/security issues
+

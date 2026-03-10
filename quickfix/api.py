@@ -184,6 +184,50 @@ def bulk_insert():
     frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
-def update():
-    pass
+def get_job_summary():
+    data=frappe.form_dict.get("Job")
+    if data:
+        print(data)
+    else:
+        # frappe.respnse("error": "Not found")
+        print("HTTP 404,Not Found")
+    doc=frappe.get_doc("Job Card",data)
+
+    result = {
+        "name": doc.name,
+        "customer_name": doc.customer_name,
+        "device_type": doc.device_type,
+        "status": doc.status,
+        "creation":doc.creation
+    }
+    return result
+
+@frappe.whitelist(allow_guest=True)
+def get_job_by_phone():
+    ip = frappe.local.request_ip
+    key = f"rate_limit:{ip}"
+
+    count = frappe.cache().get_value(key) or 0
+    if count >= 10:
+        frappe.local.response["http_status_code"] = 429
+        return {"error": "Too many requests"}
+
+    frappe.cache().set_value(key, count + 1,60)
+    return {"success": "Request allowed"}
+
+
+###Get list:
+# GET :http://quickfix-dev.localhost:8000/api/resource/Job_Card
+### Single doc:
+# GET :http://quickfix-dev.localhost:8000/api/resource/Job_Card
+
+###create doc:
+#POST : http://quickfix-dev.localhost:8000/api/resource/Spare Part
+
+###update doc:
+#PUT : http://quickfix-dev.localhost:8000/api/resource/Spare Part/None-'PART'-2026-0003
+# {"unit_cost":50}
+
+###DELETE doc:
+#http://quickfix-dev.localhost:8000/api/resource/Spare Part/None-'PART'-2026-0003
 

@@ -1,5 +1,232 @@
 [
  {
+  "charts": [
+   {
+    "chart_name": "Job count per status",
+    "label": "Job count per status",
+    "parent": "open-job-cards",
+    "parentfield": "charts",
+    "parenttype": "Workspace"
+   }
+  ],
+  "content": "[{\"id\":\"fujKcSPc6c\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 18px; letter-spacing: 0.18px;\\\"><b>QuickFix</b></span>\",\"col\":12}},{\"id\":\"mt0jwJj9bn\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Job count per status\",\"col\":12}},{\"id\":\"726bppJyvN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"total open Job Cards\",\"col\":4}},{\"id\":\"KZbEpeg6nt\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Today's revenue from delivered jobs\",\"col\":4}},{\"id\":\"Y1h8QAIb1E\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Technician\",\"col\":3}},{\"id\":\"Ralq-CauJ4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Invoice\",\"col\":3}},{\"id\":\"W4micwfyqF\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"7YTzcDcGD2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Spare Part\",\"col\":3}},{\"id\":\"KkD2h-rote\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Device Type\",\"col\":3}},{\"id\":\"g3Zz5TAsNG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Audit Log\",\"col\":3}}]",
+  "custom_blocks": [],
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "for_user": "Administrator",
+  "hide_custom": 0,
+  "icon": null,
+  "indicator_color": "green",
+  "is_hidden": 0,
+  "label": "open-job-cards",
+  "links": [],
+  "modified": "2026-03-10 12:56:32.457541",
+  "module": null,
+  "name": "open-job-cards",
+  "number_cards": [
+   {
+    "label": "Today's revenue from delivered jobs",
+    "number_card_name": "Today's revenue from delivered jobs",
+    "parent": "open-job-cards",
+    "parentfield": "number_cards",
+    "parenttype": "Workspace"
+   },
+   {
+    "label": "total open Job Cards",
+    "number_card_name": "total open Job Cards",
+    "parent": "open-job-cards",
+    "parentfield": "number_cards",
+    "parenttype": "Workspace"
+   }
+  ],
+  "parent_page": "",
+  "public": 1,
+  "quick_lists": [],
+  "restrict_to_domain": null,
+  "roles": [
+   {
+    "parent": "open-job-cards",
+    "parentfield": "roles",
+    "parenttype": "Workspace",
+    "role": "System Manager"
+   }
+  ],
+  "sequence_id": 1.0,
+  "shortcuts": [
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Service Invoice",
+    "link_to": "Service Invoice",
+    "parent": "open-job-cards",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Job Card",
+    "link_to": "Job Card",
+    "parent": "open-job-cards",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Technician",
+    "link_to": "Technician",
+    "parent": "open-job-cards",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Spare Part",
+    "link_to": "Spare Part",
+    "parent": "open-job-cards",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Device Type",
+    "link_to": "Device Type",
+    "parent": "open-job-cards",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Audit Log",
+    "link_to": "Audit Log",
+    "parent": "open-job-cards",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   }
+  ],
+  "title": "Open Job Cards"
+ },
+ {
+  "charts": [
+   {
+    "chart_name": "Job count per status",
+    "label": "Job count per status",
+    "parent": "Jobbb-Administrator",
+    "parentfield": "charts",
+    "parenttype": "Workspace"
+   }
+  ],
+  "content": "[{\"id\":\"UnlQTjtR6E\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Jobbb</span>\",\"col\":12}},{\"id\":\"a7boEQB0y5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Job count per status\",\"col\":12}}]",
+  "custom_blocks": [],
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "for_user": "Administrator",
+  "hide_custom": 0,
+  "icon": null,
+  "indicator_color": "green",
+  "is_hidden": 0,
+  "label": "Jobbb-Administrator",
+  "links": [],
+  "modified": "2026-03-09 18:05:02.371727",
+  "module": null,
+  "name": "Jobbb-Administrator",
+  "number_cards": [],
+  "parent_page": "",
+  "public": 0,
+  "quick_lists": [],
+  "restrict_to_domain": null,
+  "roles": [],
+  "sequence_id": 2.0,
+  "shortcuts": [],
+  "title": "Jobbb"
+ },
+ {
+  "charts": [
+   {
+    "chart_name": "Job count per status",
+    "label": "Status",
+    "parent": "Job Cards",
+    "parentfield": "charts",
+    "parenttype": "Workspace"
+   }
+  ],
+  "content": "[{\"id\":\"5x0YACtI0U\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Job Cards</span>\",\"col\":12}},{\"id\":\"l8GTv6Zimu\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Status\",\"col\":12}},{\"id\":\"3HItk0Qhns\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Status\",\"col\":12}}]",
+  "custom_blocks": [],
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "for_user": "",
+  "hide_custom": 0,
+  "icon": "unhide",
+  "indicator_color": "green",
+  "is_hidden": 0,
+  "label": "Job Cards",
+  "links": [],
+  "modified": "2026-03-09 18:10:24.319637",
+  "module": null,
+  "name": "Job Cards",
+  "number_cards": [],
+  "parent_page": "",
+  "public": 1,
+  "quick_lists": [],
+  "restrict_to_domain": null,
+  "roles": [],
+  "sequence_id": 28.0,
+  "shortcuts": [],
+  "title": "Job Cards"
+ },
+ {
   "charts": [],
   "content": "[{\"type\":\"onboarding\",\"data\":{\"onboarding_name\":\"Website\",\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Blog Post\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Blogger\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Web Page\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Web Form\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Website Settings\",\"col\":3}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports & Masters</b></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Blog\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Web Site\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Portal\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Knowledge Base\",\"col\":4}}]",
   "custom_blocks": [],
@@ -1316,7 +1543,7 @@
     "parent": "Users",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "DocShare",
     "type": "Link"
    },
    {

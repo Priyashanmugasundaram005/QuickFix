@@ -31,7 +31,7 @@ class CustomJobCard(JobCard):
 
 
 
-def create_audit_log(doctype_name, document_name=None, action="api_call"):
+def create_audit_log(doctype_name, document_name=None, action=None):
     frappe.log_error("audittttt")
     audit=frappe.new_doc("Audit Log")
     audit.doctype_name = doctype_name
@@ -160,7 +160,8 @@ def get_status_chart_data():
         "labels": labels,
         "datasets": [
             {"name": "Jobs", "values": values}
-        ]
+        ],
+        "type":"bar"
     }
 
 def check_low_stock():

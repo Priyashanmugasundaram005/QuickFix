@@ -1,6 +1,6 @@
 from quickfix.service_center.doctype.job_card.job_card import JobCard
-import frappe
-from frappe.utils import nowdate,today
+import frappe, requests, hashlib
+from frappe.utils import nowdate,today,now_datetime
 
 
 
@@ -204,7 +204,65 @@ def check_low_stock():
     if low_stock:
         mail=frappe.get_single_value("QuickFix Settings",'manager_email')
         frappe.sendmail(recipients=[mail],subject="Low Stock Alert",message=message)
-    
+
+def enqueue_webhook(doc,method):
+    frappe.enqueue(
+        "quickfix.overrides.custom_job_card.send_webhook",
+        job_card_name=doc.name,
+        retry_count=0,
+        queue="default",
+        timeout=60
+    )
+
+def send_hook(job_card_name,retry_count=0):
+    settings=frappe.get_single("Quickfix Settings")
+    if not settings.webhook_url:
+        return
+
+    doc=frappe.get_doc("Job Card",job_card_name)
+    payload={
+        "event":"job_submitted",
+        "job_card":doc.name,
+        "customer":doc.customer_name,
+        "amount":doc.final_amount
+    } 
+    webhook_id = hashlib.sha256(f"{doc.name}-job_submitted-{now_datetime()}".encode()).hexdigest()
+
+    # Check Audit Log to avoid duplicates
+    if frappe.db.exists("Webhook Audit Log", {"webhook_id": webhook_id}):
+        return
+
+    try:
+        r = requests.post(settings.webhook_url, json=payload, timeout=5)
+        r.raise_for_status()
+        # Log success in Audit Log
+        frappe.get_doc({
+            "doctype": "Webhook Audit Log",
+            "webhook_id": webhook_id,
+            "job_card": doc.name,
+            "status": "Success",
+            "payload": str(payload)
+        }).insert(ignore_permissions=True)
+    except Exception as e:
+        # Log failure
+        frappe.log_error(f"Webhook failed: {e}", "Webhook Error")
+        frappe.get_doc({
+            "doctype": "Webhook Audit Log",
+            "webhook_id": webhook_id,
+            "job_card": doc.name,
+            "status": f"Failed: {e}",
+            "payload": str(payload)
+        }).insert(ignore_permissions=True)
+
+        # Retry with 60s delay, max 3 retries
+        if retry_count < 3:
+            frappe.enqueue(
+                "quickfix.quickfix.doctype.job_card.job_card.send_webhook",
+                job_card_name=job_card_name,
+                retry_count=retry_count + 1,
+                queue="default",
+                delay=60
+            )   
    
 
 

@@ -216,6 +216,24 @@ def get_job_by_phone():
     return {"success": "Request allowed"}
 
 
+@frappe.whitelist(allow_guest=True)
+def get_status_chart_data():
+    cache_key = "job_card_status_chart"
+
+    data = frappe.cache().get_value(cache_key)
+
+    if not data:
+        data = frappe.db.sql("""
+            SELECT status, COUNT(*) as count
+            FROM `tabJob Card`
+            GROUP BY status
+        """, as_dict=True)
+
+        frappe.cache().set_value(cache_key, data, expires_in_sec=300)
+
+    return data
+
+
 ###Get list:
 # GET :http://quickfix-dev.localhost:8000/api/resource/Job_Card
 ### Single doc:

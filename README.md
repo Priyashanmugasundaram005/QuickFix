@@ -865,8 +865,14 @@ On development sites, scheduled jobs may:
 - Send unwanted emails or notifications
 - Consume system resources
 - Interfere with testing
-
 Disabling the scheduler ensures that background jobs do not run automatically during development.
+
+Explain retry behavior: how many times does Frappe retry a failed background job by
+default?
+
+If a background job fails, it will not retry automatically. The job is marked Failed immediately.
+
+
 
 ## N+1 Query Problem and Fix
 
@@ -884,6 +890,7 @@ FROM `tabJob Card` jc
 LEFT JOIN `tabTechnician` t
 ON jc.assigned_technician = t.name
 """, as_dict=True)
+```
 
 ### Bulk operations
 
@@ -903,4 +910,121 @@ Slower writes: Insert, update, and delete operations become slower because index
 More storage usage: Each index consumes additional database space.
 Maintenance overhead: Too many indexes can reduce overall database performance.
 Therefore,indexes should only be added to fields frequently used in filters, joins, or search operations.
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
+### Resource API
+
+Get list:
+GET :http://quickfix-dev.localhost:8000/api/resource/Job_Card
+**Response**:
+ "data": [
+        {"name": "JC-2026-00002"},{"name": "JC-2026-00004"},{"name": "JC-2026-00012"},................]
+
+Single doc:
+GET :http://quickfix-dev.localhost:8000/api/resource/Spare Part/None-'PART'-2026-0003
+**Response**:
+"data": {
+        "name": "None-'PART'-2026-0003",
+        "owner": "Administrator",
+        "creation": "2026-03-10 11:37:38.562906",
+        "modified": "2026-03-10 11:37:38.562906",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "part_name": "Temper",
+        "unit_cost": 30.0,
+        "selling_price": 60.0,
+        "stock_qty": 0.0,
+        "reorder_level": 5.0,
+        "is_active": 1,
+        "doctype": "Spare Part"
+    }
+
+create doc:
+POST : http://quickfix-dev.localhost:8000/api/resource/Spare Part
+{"part_name":"Temper",
+"selling_price":60,
+"unit_cost":30}
+**Response**:
+    "data": {
+        "name": "None-'PART'-2026-0003",
+        "owner": "Administrator",
+        "creation": "2026-03-10 11:37:38.562906",
+        "modified": "2026-03-10 11:37:38.562906",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "part_name": "Temper",
+        "unit_cost": 30.0,
+        "selling_price": 60.0,
+        "stock_qty": 0.0,
+        "reorder_level": 5.0,
+        "is_active": 1,
+        "doctype": "Spare Part"
+    },
+
+
+Update doc:
+PUT : http://quickfix-dev.localhost:8000/api/resource/Spare Part/None-'PART'-2026-0003
+ {"unit_cost":50}
+**Response**:"data": "ok"
+
+DELETE doc:
+http://quickfix-dev.localhost:8000/api/resource/Spare Part/None-'PART'-2026-0003
+**Response**:"data": "ok"
+
+Q:what is the difference between session cookie auth and token
+auth? Which is appropriate for browser use and which for server-to-server?
+
+**Session Cookie Authentication**
+- Used when a user logs in through the browser.
+- The server creates a session and stores the session ID in browser cookies.
+- Suitable for **browser-based applications**.
+
+**Token Authentication**
+- Uses **API key and API secret** sent in the request header.
+- Does not require login sessions.
+- Suitable for **server-to-server communication or external API integrations**.
+
+## Return Type Serialization Result
+
+**Result:**
+When a Python `date` object is returned from a whitelisted method, Frappe automatically converts it into a JSON string in the API response.
+
+Example JSON response:
+{
+  "message": "2026-03-10"
+}
+
+**Explanation:**
+Frappe serializes Python objects like `date`, `datetime`, and `Decimal` into JSON-compatible formats. The Python `date` object is converted into an ISO formatted string (`YYYY-MM-DD`) before sending the response.
+
+Q:what are the real risks of allow_guest=True endpoints? List 3 specific attack vectors.
+
+Endpoints in Frappe with `allow_guest=True` allow **unauthenticated access**, which can expose your application to several security risks.  
+
+### Real Risks
+1. **Data Exposure** – Sensitive data can be accessed by anyone without login if proper checks are not implemented.  
+2. **Abuse / Spam** – Open endpoints can be used to flood your system with requests, causing **DoS (Denial of Service)** or spam entries.  
+3. **Unauthorized Actions** – If endpoint logic allows data modification, attackers can potentially manipulate records or perform actions without authentication.  
+
+
+## Server Script Analysis (Short)
+
+**Blocked Functions/Modules:** `os.system`, `subprocess`, `eval/exec`, `open()`
+
+**Cannot Do in Server Script Can do in App Code**  
+- Create/modify DocTypes  
+- Import arbitrary Python modules  
+- Run system-level commands  
+
+**Acceptable Use Cases:**  
+- Lightweight automation (e.g., send welcome email)  
+- Quick validation or field updates  
+
+**Require App Code:**  
+- Complex multi-DocType logic  
+- External integrations or heavy computation  
+
+**Governance/Maintainability Risk:**  
+- Hidden logic, no version control, performance/security issues

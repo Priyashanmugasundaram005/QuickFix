@@ -162,7 +162,7 @@ doc_events = {
         "on_submit":"quickfix.overrides.custom_job_card.log",
         "on_save":"quickfix.overrides.custom_job_card.log",
 		"on_cancel": "quickfix.overrides.custom_job_card.log",
-		"on_trash": "quickfix.overrides.custom_job_card.log"
+		# "on_trash": "quickfix.overrides.custom_job_card.log"
 	 },
     # "Job Card":{
     #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"

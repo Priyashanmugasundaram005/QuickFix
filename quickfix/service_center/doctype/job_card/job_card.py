@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 
 
-import frappe
+import frappe,requests,json
 from frappe.model.document import Document
 import re
 from frappe.utils import nowdate
@@ -81,7 +81,46 @@ class JobCard(Document):
 		frappe.sendmail(recipients=self.customer_email,attachments=[{
         "fname": "Job_Card_Receipt.pdf",
         "fcontent": pdf
-    }])
+    	}])
+
+		frappe.enqueue(
+        self.send_webhook,
+        job_card_name=self.name,
+        retry_count=0,
+        queue="default",
+        timeout=60
+    )
+		
+	def send_webhook(self,job_card_name,retry=0):
+
+		settings = frappe.get_single("QuickFix Settings")
+
+		if not settings.webhook_url:
+			return
+
+		
+
+		payload = {
+			"event": "job_submitted",
+			"job_card": self.name,
+			"customer": self.customer_name,
+			"amount": self.final_amount
+		}
+
+		try:
+			requests.post(settings.webhook_url, json=payload, timeout=5)
+
+		except Exception as e:
+			frappe.log_error(f"Webhook failed: {e}", "Webhook Error")
+
+			if retry < 3:
+				frappe.enqueue(
+					"quickfix.api.send_webhook",
+					job_card_name=job_card_name,
+					retry=retry+1,
+					enqueue_after_commit=True,
+					timeout=60
+				)
 
 
 

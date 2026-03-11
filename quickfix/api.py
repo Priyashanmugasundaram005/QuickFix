@@ -1,5 +1,5 @@
-import frappe
-from frappe.utils import now_datetime, add_days,nowdate, add_months,now
+import frappe,hmac,hashlib,json
+from frappe.utils import now_datetime, add_days,nowdate, add_months,now,time
 
 from datetime import datetime
 from frappe.query_builder import DocType
@@ -246,6 +246,54 @@ def get_status_chart_data():
         ],
         "type":"bar"
     }
+
+@frappe.whitelist(allow_guest=True)
+def payment_webhook():
+
+  payload = frappe.request.data
+  secret = frappe.conf.get("payment_webhook_secret", "")
+  signature = frappe.get_request_header("X-Signature")
+
+  expected = hmac.new(
+    secret.encode(),
+    payload,
+    hashlib.sha256
+  ).hexdigest()
+
+  print("==================================",expected)
+  print("=================================",signature)
+  if not signature or not hmac.compare_digest(expected, signature):
+    frappe.throw("Invalid signature", frappe.AuthenticationError)
+
+  data = json.loads(payload)
+
+  ref = data.get("ref")
+  amount = data.get("amount")
+
+  if frappe.db.exists(
+    "Audit Log",
+    {"action": "payment_received", "document_name": ref}
+  ):
+    return {"status": "duplicate", "message": "Already processed"}
+
+  job = frappe.get_doc("Job Card", ref)
+  job.payment_status = "Paid"
+  job.paid_amount = amount
+  job.save(ignore_permissions=True)
+
+  frappe.get_doc({
+    "doctype": "Audit Log",
+    "doctype_name":"Job Card",
+    "action": "payment_received",
+    "document_name": ref,
+    "user": "Administrator",
+    "timestamp": now()
+
+  }).insert(ignore_permissions=True)
+
+  frappe.db.commit()
+
+  return {"status": "ok"}
 
     
 

@@ -77,6 +77,14 @@ class JobCard(Document):
 		new_ent.docstatus=1
 		new_ent.insert(ignore_permissions=True)
 
+		pdf=frappe.get_print(self.doctype,self.name,"Job Card Receipt",as_pdf=True)
+		frappe.sendmail(recipients=self.customer_email,attachments=[{
+        "fname": "Job_Card_Receipt.pdf",
+        "fcontent": pdf
+    }])
+
+
+
 	def mail(self=None, customer_email=None):
 		frappe.log_error("customer_emailllllllll",customer_email)
 		frappe.sendmail(recipients=customer_email,message="Your job is ready")
@@ -101,6 +109,10 @@ class JobCard(Document):
 		if invoice:
 			inv=frappe.get_doc("Service Invoice",invoice)
 			inv.cancel()
+
+	def on_update(self):
+		frappe.cache().delete_value("job_card_status_chart")
+    	
 
 	def on_trash(self):
 		if not self.status in ['Draft','Cancelled']:

@@ -66,7 +66,8 @@
   {
    "fieldname": "customer_email",
    "fieldtype": "Data",
-   "label": "Customer Email"
+   "label": "Customer Email",
+   "options": "Email"
   },
   {
    "fieldname": "device_type",
@@ -208,7 +209,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-09 22:13:56.698456",
+ "modified": "2026-03-11 12:05:17.822374",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

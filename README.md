@@ -906,10 +906,12 @@ Bulk Insert Time: 0.09565520286560059
 
 Indexes speed up read queries, but they also have costs:
 
-Slower writes: Insert, update, and delete operations become slower because indexes must also be updated.
-More storage usage: Each index consumes additional database space.
-Maintenance overhead: Too many indexes can reduce overall database performance.
+**Slower writes**: Insert, update, and delete operations become slower because indexes must also be updated.
+**More storage usage**: Each index consumes additional database space.
+**Maintenance overhead**: Too many indexes can reduce overall database performance.
+
 Therefore,indexes should only be added to fields frequently used in filters, joins, or search operations.
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### Resource API
@@ -1029,3 +1031,51 @@ Endpoints in Frappe with `allow_guest=True` allow **unauthenticated access**, wh
 **Governance/Maintainability Risk:**  
 - Hidden logic, no version control, performance/security issues
 
+## Frappe Redis Cache
+
+Frappe uses Redis to cache frequently accessed data to improve performance and reduce database queries.
+
+❌frappe.cache.get_value("bootinfo")
+✅frappe.cache.hget("bootinfo",frappe.session.user)
+
+❌frappe.cache.get_value("quickfix:translations")  ---- As the key doesnt exist
+✅frappe.cache().hget("merged_translations","en")
+
+### Common Data Cached in Redis
+
+1. **Boot Info**
+   - Contains information loaded during user login such as user details, roles, permissions, system defaults, and installed apps.
+   - Used by the Desk UI to initialize the session.
+
+2. **DocType Metadata (Meta)**
+   - Stores the structure of DocTypes including fields, field types, permissions, and relationships.
+   - Prevents repeated database queries when loading DocType definitions.
+
+3. **Website Context**
+   - Caches website-related data such as page context, templates, and configuration used for rendering web pages.
+
+4. **Translations**
+   - UI translation strings for different languages are cached (e.g., `merged_translations`).
+   - Improves performance by avoiding repeated loading of translation files.
+
+5. **User Permissions**
+   - Stores role-based permissions and access control rules for users.
+   - Helps quickly validate whether a user can access specific documents or actions.
+
+### Benefit
+Caching these items in Redis reduces database load and improves the overall performance of the Frappe framework.
+
+
+## Stale UI Demonstration (Without Cache Invalidation)
+
+Initially, the dashboard chart used cached Job Card status data. After changing a Job Card status, the chart still showed **old data** because the cache was not cleared.
+
+After adding cache invalidation in the **on_update** event, the cache is cleared and the dashboard now shows the **updated data correctly**.
+
+## Debugging Stale UI
+
+- **Old JS after changes:** Run `bench build --app quickfix` to rebuild frontend assets and clear the asset cache so the browser loads the updated JS.
+
+- **Role of bench build:** It compiles and bundles the app’s JS/CSS files and updates the built assets used by the browser.
+
+- **Old DocType field labels:** Run `bench migrate` or `bench clear-cache` to clear the **DocType metadata cache** so users see the updated fields.

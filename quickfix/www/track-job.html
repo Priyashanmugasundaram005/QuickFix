@@ -46,9 +46,7 @@
                 <li><strong>Payment Status:</strong> {{ job.payment_status }}</li>
                 {% set tech = frappe.db.get_value("Technician", job.assigned_technician, "technician_name") %}
                 <li><strong>Assigned Technician:</strong> {{ tech or 'Not Assigned' }}</li>
-                <li><strong>Parts Total Amount:</strong> {{ job.parts_total }}</li>
-                <li><strong>Labour Charge:</strong> {{ job.labour_charge }}</li>
-                <li><strong>Total Amount:</strong> {{ job.final_amount }}</li>
+                
             </ul>
         {% else %}
             <p style="color:red; font-weight:500;">Invalid Job ID. Please select a valid job card.</p>

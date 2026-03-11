@@ -207,7 +207,7 @@ def get_job_by_phone():
     ip = frappe.local.request_ip
     key = f"rate_limit:{ip}"
 
-    count = frappe.cache().get_value(key) or 0
+    count = frappe.cache().get(key) or 0
     if count >= 10:
         frappe.local.response["http_status_code"] = 429
         return {"error": "Too many requests"}
@@ -220,18 +220,34 @@ def get_job_by_phone():
 def get_status_chart_data():
     cache_key = "job_card_status_chart"
 
-    data = frappe.cache().get_value(cache_key)
+    data = frappe.cache.get_value(cache_key)
+
 
     if not data:
+        frappe.log_error("yyyyy")
         data = frappe.db.sql("""
             SELECT status, COUNT(*) as count
             FROM `tabJob Card`
             GROUP BY status
         """, as_dict=True)
 
-        frappe.cache().set_value(cache_key, data, expires_in_sec=300)
+        frappe.cache.set_value(cache_key, data, expires_in_sec=300)
+    labels = []
+    values = []
 
-    return data
+    for d in data:
+        labels.append(d.status)
+        values.append(d.count)
+
+    return {
+        "labels": labels,
+        "datasets": [
+            {"name": "Jobs", "values": values}
+        ],
+        "type":"bar"
+    }
+
+    
 
 
 ###Get list:

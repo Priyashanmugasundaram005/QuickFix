@@ -868,7 +868,7 @@ Frappe uses Redis to cache frequently accessed data to improve performance and r
 ❌frappe.cache.get_value("bootinfo")
 ✅frappe.cache.hget("bootinfo",frappe.session.user)
 
-❌frappe.cache.get_value("quickfix:translations")  ---- As the key doesnt exist
+❌frappe.cache.get_value("quickfix:translations")  ---- As the key doesnt exist.
 ✅frappe.cache().hget("merged_translations","en")
 
 ### Common Data Cached in Redis

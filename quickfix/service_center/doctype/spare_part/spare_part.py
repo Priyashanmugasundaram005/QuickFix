@@ -17,7 +17,7 @@ class SparePart(Document):
 		self.name=f"{self.part_code}-'PART'-{year}-{secq}"
 
 	def validate(self):
-		if self.selling_price<self.unit_cost:
+		if self.selling_price<=self.unit_cost:
 			frappe.throw("Selling Price should be greater than Unit Cost")
 
 	def on_update(self):
@@ -25,7 +25,7 @@ class SparePart(Document):
   		# without loading the full document, improving performance in frequent calls like on_update.
 
 
-		threshold = frappe.db.get_value("QuickFix Settings", "low_stock_threshold")
+		threshold = frappe.db.get_single_value("QuickFix Settings", "low_stock_threshold")
 		
 
 

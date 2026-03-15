@@ -1,0 +1,140 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div style="max-width:650px; margin:80px auto; padding:20px; background:#f9f9f9; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+
+    <h2 style="margin-bottom:25px; text-align:center; color:#333;">
+        Track Your Job Status
+    </h2>
+
+    <form method="GET" action="/track_job">
+
+        <!-- Track by Job ID -->
+        <div class="form-group">
+            <label for="job_id"><strong>Select Job ID</strong></label>
+
+            {% set job_cards = frappe.get_all("Job Card", pluck="name", order_by="creation asc") %}
+
+            <select name="job_id" id="job_id" class="form-control">
+                <option value="">-- Choose Job Card --</option>
+
+                {% for jc in job_cards %}
+                    <option value="{{ jc }}">{{ jc }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <p style="text-align:center; margin:10px 0; color:#666;">
+            OR
+        </p>
+
+        <!-- Track by Phone -->
+        <div class="form-group">
+            <label for="phone"><strong>Enter Phone Number</strong></label>
+
+            <input
+                type="text"
+                name="phone"
+                id="phone"
+                class="form-control"
+                placeholder="Enter Phone Number"
+                maxlength="10"
+                pattern="[0-9]{10}"
+            >
+
+            <small style="color:#777;">Digits only (10 numbers)</small>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button type="submit" class="btn btn-success" style="padding:8px 25px;">
+                Track Job
+            </button>
+        </div>
+
+    </form>
+
+
+    {% if frappe.form_dict.job_id %}
+
+        <hr style="margin:30px 0;">
+        {% set job = frappe.get_doc("Job Card", frappe.form_dict.job_id) %}
+
+        {% if job %}
+
+            {% set tech = frappe.db.get_value("Technician", job.assigned_technician, "technician_name") %}
+
+            <h4>Job Details</h4>
+
+            <ul style="list-style:none; padding-left:0; line-height:1.8;">
+                <li><strong>Job ID:</strong> {{ job.name }}</li>
+                <li><strong>Customer:</strong> {{ job.customer_name }}</li>
+                <li><strong>Status:</strong> {{ job.status }}</li>
+                <li><strong>Payment Status:</strong> {{ job.payment_status }}</li>
+                <li><strong>Assigned Technician:</strong> {{ tech or "Not Assigned" }}</li>
+            </ul>
+
+        {% else %}
+
+            <p style="color:red;">Invalid Job ID.</p>
+
+        {% endif %}
+
+    {% endif %}
+
+
+
+    {% if frappe.form_dict.phone %}
+
+        <hr style="margin:30px 0;">
+
+        {% set phone = frappe.form_dict.phone | replace(" ", "") %}
+        {% set phone = phone[:10] %}
+
+        {% if phone.isdigit() %}
+
+            {% set jobs = frappe.get_all(
+                "Job Card",
+                filters={"customer_phone": phone},
+                fields=["name","customer_name","status","payment_status","assigned_technician"]
+            ) %}
+
+            {% if jobs and jobs|length > 0 %}
+
+                <h4>Jobs Found</h4>
+
+                <ul style="list-style:none; padding-left:0;">
+
+                {% for job in jobs %}
+
+                    {% set tech = frappe.db.get_value("Technician", job.assigned_technician, "technician_name") %}
+
+                    <li style="margin-bottom:15px; padding:10px; background:#fff; border-radius:5px;">
+                        <strong>Job ID:</strong> {{ job.name }} <br>
+                        <strong>Customer:</strong> {{ job.customer_name }} <br>
+                        <strong>Status:</strong> {{ job.status }} <br>
+                        <strong>Payment Status:</strong> {{ job.payment_status }} <br>
+                        <strong>Assigned Technician:</strong> {{ tech or "Not Assigned" }}
+                    </li>
+
+                {% endfor %}
+
+                </ul>
+
+            {% else %}
+
+                <p style="color:red;">No job records found for this phone number.</p>
+
+            {% endif %}
+
+        {% else %}
+
+            <p style="color:red;">Invalid phone number.</p>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

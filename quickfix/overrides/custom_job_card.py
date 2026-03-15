@@ -1,6 +1,6 @@
 from quickfix.service_center.doctype.job_card.job_card import JobCard
 import frappe, requests,hmac, hashlib, json
-from frappe.utils import nowdate,today
+from frappe.utils import nowdate,today,getdate
 
 
 
@@ -32,12 +32,12 @@ class CustomJobCard(JobCard):
 
 
 
-def create_audit_log(doctype_name, document_name=None, action=None):
+def create_audit_log(doc,doctype_name, document_name=None, action=None):
     frappe.log_error("audittttt")
     audit=frappe.new_doc("Audit Log")
     audit.doctype_name = doctype_name
     audit.document_name=document_name
-    if doctype_name=="Scheduled Job Log":
+    if doctype_name=="Scheduled Job Log" and doc.scheduled_job_type=="custom_job_card.check_low_stock":
         audit.action="low_stock_check"
     else:
         audit.action=action
@@ -56,7 +56,7 @@ def log(doc, method):
     if doc.doctype not in allowed:
         return
 
-    create_audit_log(doc.doctype, doc.name, method)
+    create_audit_log(doc,doc.doctype, doc.name, method)
 
 # def validate_job_card(doc, method):
 #     # Hook-level validation
@@ -163,7 +163,7 @@ def get_status_chart_data():
 
 def check_low_stock():
     last_run = frappe.db.get_value("Audit Log",
-    {"action":"low_stock_check","timestamp":today()}, "name")
+    {"action":"low_stock_check","timestamp":getdate(today())}, "name")
     if last_run:
         return
     low_stock = frappe.db.sql("""

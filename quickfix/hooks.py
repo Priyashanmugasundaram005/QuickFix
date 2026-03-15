@@ -30,13 +30,13 @@ app_include_js = "quickfix.bundle.js"
 
 # website_route_rules=[{"form_route":"/track-job","to_route":"track-job"}]
 website_route_rules = [
-    {"from_route": "/track-job", "to_route": "track-job"}
+    {"from_route": "/track-job", "to_route": "track_job"}
 ]
 
 portal_menu_items = [
     {
         "title": "Track My Job",
-        "route": "/track-job",
+        "route": "/track_job",
         "role": "Guest"
     }
 ]

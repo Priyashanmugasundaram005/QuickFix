@@ -59,6 +59,10 @@ Pre-commit is configured to use the following tools for checking and formatting 
 mit
 
 ##
+
+### Workflow
+
+<video controls src="Final Quickfix.webm" title="Title"></video>
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 # Step 1 – Routing
 

@@ -257,11 +257,13 @@ class TestJobCard(FrappeTestCase):
 
 		self.assertEqual(job.docstatus,1)
 
-	# def test_on_submit_deducts_stock(self):
-	# 	before_stock = frappe.db.get_value("Spare Part",self.part.name,"stock_qty")
+	def test_on_submit_deducts_stock(self):
+		self.job.status="Ready for Delivery"
+		before_stock = frappe.db.get_value("Spare Part",self.spare.name,"stock_qty")
+		self.job.submit()
+		after_stock = frappe.db.get_value("Spare Part",self.spare.name,"stock_qty")
 
-	# 	self.job.submit()
-
+		self.assertEqual(before_stock,after_stock,1)
 
 
 

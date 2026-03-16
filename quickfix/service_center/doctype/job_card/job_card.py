@@ -142,20 +142,20 @@ class JobCard(Document):
 		
 
 
+	# @frappe.whitelist()
+	# def on_cancel(self):
+	# 	# if frappe.flags.in_tests:
+	# 	# 	return
+	# 	self.status='Cancelled'
 
-	def on_cancel(self):
-		# if frappe.flags.in_tests:
-		# 	return
-		self.status='Cancelled'
+	# 	for part in self.parts_used:
+	# 		current=frappe.db.get_value("Spare Part",part,'stock_qty') or 0
+	# 		frappe.db.set_value("Spare Part",part,'stock_qty',current+part.quantity)
 
-		for part in self.parts_used:
-			current=frappe.db.get_value("Spare Part",part,'stock_qty') or 0
-			frappe.db.set_value("Spare Part",part,'stock_qty',current+part.quantity)
-
-		invoice=frappe.get_value("Service Invoice",{'job_card':self.name,'docstatus':1})    # Not required 
-		if invoice:
-			inv=frappe.get_doc("Service Invoice",invoice)
-			inv.cancel()
+	# 	invoice=frappe.get_value("Service Invoice",{'job_card':self.name,'docstatus':1})    # Not required 
+	# 	if invoice:
+	# 		inv=frappe.get_doc("Service Invoice",invoice)
+	# 		inv.cancel()
 
 	def on_update(self):
 		frappe.cache().delete_value("job_card_status_chart")
@@ -178,6 +178,11 @@ class JobCard(Document):
 		return tech
 
 	@frappe.whitelist()
+	def cancellll(self):
+		frappe.log_error("11111111111111111")
+		self.cancel()
+
+	@frappe.whitelist()
 	def real(self):
 		frappe.log_error("reallll")
 		frappe.publish_realtime(
@@ -187,10 +192,8 @@ class JobCard(Document):
 	@frappe.whitelist()
 	def new_tech(self,new_technician):
 		frappe.log_error(new_technician)
-		frappe.enqueue(
-		method=self.send_job_ready_email,
-		queue="short")
 		self.assigned_technician=new_technician
+		self.save(ignore_permissions=True)
 
 	def before_print(self,print_settings=None):
    		self.print_summary = f"{self.customer_name} - {self.device_type} {self.device_model}"	

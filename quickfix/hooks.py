@@ -156,21 +156,21 @@ on_logout="quickfix.service_center.doctype.audit_log.audit_log.log_out"
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"*": {
-		"on_update": "quickfix.overrides.custom_job_card.log",
-        "on_submit":"quickfix.overrides.custom_job_card.log",
-        "on_save":"quickfix.overrides.custom_job_card.log",
-		"on_cancel": "quickfix.overrides.custom_job_card.log",
-		# "on_trash": "quickfix.overrides.custom_job_card.log"
-	 },
-    #  "Job Card":{
-    #      "on_submit":"quickfix.api.payment_webhook"
-    #  }
-    # "Job Card":{
-    #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"
-    # }
-}
+# doc_events = {
+# 	"*": {
+# 		"on_update": "quickfix.overrides.custom_job_card.log",
+#         "on_submit":"quickfix.overrides.custom_job_card.log",
+#         "on_save":"quickfix.overrides.custom_job_card.log",
+# 		"on_cancel": "quickfix.overrides.custom_job_card.log",
+# 		# "on_trash": "quickfix.overrides.custom_job_card.log"
+# 	 },
+#     #  "Job Card":{
+#     #      "on_submit":"quickfix.api.payment_webhook"
+#     #  }
+#     # "Job Card":{
+#     #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"
+#     # }
+# }
 
 # Scheduled Tasks
 # ---------------

@@ -54,26 +54,31 @@ frappe.ui.form.on("Job Card", {
         //         "blue"
         //     );
 
-        frm.add_custom_button("Reject Job",()=>{
-            let dialog =new frappe.ui.Dialog({
-                title:'Reject',
-                fields:[
-                    {
-                        label: 'Rejection Reason',
-                        fieldname: 'reason',
-                        fieldtype: 'Small Text',
-                        reqd:1
-                    }
-                ],
-                primary_action_label:'Submit',
-                primary_action(values){
-                    console.log(values)
-                    frappe.msgprint("Job Rejected");
-                    dialog.hide();
-                }
-            });
-            dialog.show();
+        frm.add_custom_button("Reject Job", () => {
+    let dialog = new frappe.ui.Dialog({
+        title: "Reject Job",
+        fields: [
+            {
+                label: "Rejection Reason",
+                fieldname: "reason",
+                fieldtype: "Small Text",
+                reqd: 1
+            }
+        ],
+        primary_action_label: "Submit",
+        primary_action(values) {
+            console.log("###############")
+            frm.call('cancellll'); 
+            // frappe.msgprint("Job Rejected");
+
+              // This will trigger on_cancel() in Python
+
+            dialog.hide();
+        }
     });
+
+    dialog.show();
+});
 
     if (frm.doc.docstatus !=1){
     frm.add_custom_button("Transfer Technician",()=>
@@ -100,7 +105,7 @@ frappe.ui.form.on("Job Card", {
 
         ],(values)=>{
             frappe.confirm("Do you need to proceed with this Technician",()=>{
-                frm.trigger('assigned_technician')
+                // frm.trigger('assigned_technician')
                 frm.call('new_tech',{new_technician:values.new})
             })
         }

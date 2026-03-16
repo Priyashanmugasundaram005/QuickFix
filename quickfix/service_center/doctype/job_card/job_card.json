@@ -184,6 +184,7 @@
    "label": "Remarks"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -202,14 +203,16 @@
   {
    "fieldname": "company",
    "fieldtype": "Float",
-   "label": "Company"
+   "hidden": 1,
+   "label": "Company",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-11 12:05:17.822374",
+ "modified": "2026-03-16 13:18:17.684753",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

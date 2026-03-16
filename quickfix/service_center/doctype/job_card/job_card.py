@@ -24,6 +24,8 @@ class JobCard(Document):
 
 		if self.status in required_statuses and not frappe.db.exists("Technician",{'status':'Active','name':self.assigned_technician}):
 			frappe.throw("Assigned Technician not available. Select other technician")
+		if self.status=="In Repair" and self.estimated_cost==0:
+			frappe.throw("Estimated cost cannot be zero when status is in In Repair")
 
 		
 
@@ -49,16 +51,14 @@ class JobCard(Document):
 		if self.status!="Ready for Delivery":
 			frappe.throw("Job is not ready for delivery")
 		for row in self.parts_used:
-			stock=frappe.get_value("Spare Part",row.part,['stock_qty'])
+			stock=frappe.get_value("Spare Part",row.part,['stock_qty'])or 0
 			if stock<row.quantity:
-				frappe.throw("Stock unavailable")
+				frappe.throw("Stock unavailable ",frappe.ValidationError)
 		self.status="Delivered"
 
 
 	def on_submit(self):
-		frappe.enqueue(
-		method=self.send_job_ready_email,
-		queue="short")
+		
 		for part in self.parts_used:
 			current=frappe.db.get_value("Spare Part",part,'stock_qty')or 0
 			#  We use frappe.db.set_value for stock deduction because this is asystem-initiated update during document submission.
@@ -77,19 +77,28 @@ class JobCard(Document):
 		new_ent.docstatus=1
 		new_ent.insert(ignore_permissions=True)
 
+		self.maill()
+
+	def maill(self):
+		if frappe.flags.in_tests:
+			return
+		frappe.enqueue(
+		method=self.send_job_ready_email,
+		queue="short")
+
 		pdf=frappe.get_print(self.doctype,self.name,"Job Card Receipt",as_pdf=True)
 		frappe.sendmail(recipients=self.customer_email,attachments=[{
-        "fname": "Job_Card_Receipt.pdf",
-        "fcontent": pdf
-    	}])
+		"fname": "Job_Card_Receipt.pdf",
+		"fcontent": pdf
+		}])
 
 		frappe.enqueue(
-        self.send_webhook,
-        job_card_name=self.name,
-        retry_count=0,
-        queue="default",
-        timeout=60
-    )
+		self.send_webhook,
+		job_card_name=self.name,
+		retry_count=0,
+		queue="default",
+		timeout=60
+	)
 		
 	def send_webhook(self,job_card_name,retry=0):
 
@@ -97,9 +106,6 @@ class JobCard(Document):
 
 		if not settings.webhook_url:
 			return
-
-		
-
 		payload = {
 			"event": "job_submitted",
 			"job_card": self.name,
@@ -138,6 +144,8 @@ class JobCard(Document):
 
 
 	def on_cancel(self):
+		# if frappe.flags.in_tests:
+		# 	return
 		self.status='Cancelled'
 
 		for part in self.parts_used:
@@ -154,6 +162,7 @@ class JobCard(Document):
     	
 
 	def on_trash(self):
+		
 		if not self.status in ['Draft','Cancelled']:
 			frappe.throw(f"Cannot delete job card with status `{self.status}'.""Only Job Cards with Draft or Cancelled status can be deleted.")
 

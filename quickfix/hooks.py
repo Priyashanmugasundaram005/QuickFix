@@ -164,9 +164,9 @@ doc_events = {
 		"on_cancel": "quickfix.overrides.custom_job_card.log",
 		# "on_trash": "quickfix.overrides.custom_job_card.log"
 	 },
-     "Job Card":{
-         "on_submit":"quickfix.overrides.custom_job_card.enqueue_webhook"
-     }
+    #  "Job Card":{
+    #      "on_submit":"quickfix.api.payment_webhook"
+    #  }
     # "Job Card":{
     #     "validate":"quickfix.overrides.custom_job_card.validate_job_card"
     # }

@@ -122,7 +122,7 @@ class TestJobCard(FrappeTestCase):
 	def test_final_amount_computation(self):
 
 		spare = create_spare_part(
-			part_code="_calc_test",
+			part_code="_TT",
 			stock_qty=10,
 			u_cost=200,
 			s_cost=300
@@ -162,17 +162,121 @@ class TestJobCard(FrappeTestCase):
 		self.job.status = "In Repair"
 		self.assertEqual(self.job.status, "In Repair")
 
+	def test_imated_cost_required_for_advanced_statuses(self):
+		self.job.status = "In Repair"
+		self.job.estimated_cost = 0
+		with self.assertRaises(frappe.ValidationError):
+			self.job.save()
+
+	def test_cannot_submit_without_ready_for_delivery(self):
+		self.job.status = "In Repair"
+		self.job.save()
+		with self.assertRaises(frappe.ValidationError):
+			self.job.submit()
+	
+	
+	def test_job_submit_in_ready_for_delivery(self):
+		self.job.status = "Ready for Delivery"
+		self.job.save()
+		self.job.submit()
+		self.assertEqual(self.job.docstatus,1)
+
+	def test_child_row_computation(self):
+		part = create_spare_part(stock_qty=0)
+		tech = create_technician()
+		job = frappe.get_doc({
+			"doctype": "Job Card",
+			"customer_name": "Test Customer",
+			"customer_phone": "8907654321",
+			"device_type": "_Test Device",
+			"problem_description": "Test issue",
+			"assigned_technician":tech.name ,
+			"diagnosis_notes": "Test",
+			"estimated_cost": 600,
+			"parts_used": [
+				{
+					"part": part.name,
+					"part_name": part.part_name,
+					"unit_price": part.selling_price,
+					"quantity": 2
+				},
+				{
+					"part": part.name,
+					"part_name": part.part_name,
+					"unit_price": part.selling_price,
+					"quantity": 1
+				}
+			],
+			"status": "Draft"
+		})
+		job.insert()
+		job.reload()
+
+		total_1 = 2 * part.selling_price
+		total_2 = 1 * part.selling_price
+
+		self.assertEqual(job.parts_used[0].total_price, total_1)
+		self.assertEqual(job.parts_used[1].total_price, total_2)
+
+		expected_total = total_1 + total_2
+		self.assertEqual(job.parts_total, expected_total)
+	
+	def test_stock_check_on_submit(self):
+		part = create_spare_part(part_code="zeroo",stock_qty=0)
+		tech = create_technician()
+		job = frappe.get_doc({
+			"doctype": "Job Card",
+			"customer_name": "Test Customer",
+			"customer_phone": "8907654321",
+			"device_type": "_Test Device",
+			"problem_description": "Test issue",
+			"assigned_technician":tech.name ,
+			"diagnosis_notes": "Test",
+			"estimated_cost": 600,
+			"parts_used": [
+				{
+					"part": part.name,
+					"part_name": part.part_name,
+					"unit_price": part.selling_price,
+					"quantity": 1
+				}
+			],
+			"status": "Ready for Delivery"
+		}).insert()
+		
+		st=frappe.get_value("Spare Part",part.name,'stock_qty')
+		print(st)
+		with self.assertRaises(frappe.ValidationError) as qty:
+			job.submit()
+
+		self.assertIn("Stock unavailable",str(qty.exception))
+
+		frappe.db.set_value("Spare Part",part.name,"stock_qty",5)
+		job.reload()
+		job.submit()
+
+		self.assertEqual(job.docstatus,1)
+
+	# def test_on_submit_deducts_stock(self):
+	# 	before_stock = frappe.db.get_value("Spare Part",self.part.name,"stock_qty")
+
+	# 	self.job.submit()
+
+
+
+
+
 
 	def tearDown(self):
 
-		# logs = frappe.get_all(
-		# 	"Audit Log",
-		# 	filters={"doctype_name": ["in", ["Job Card",]]},
-		# 	pluck="name"
-		# )
+		logs = frappe.get_all(
+			"Audit Log",
+			filters={"doctype_name": ["in", ["Job Card",]]},
+			pluck="name"
+		)
 
-		# for log in logs:
-		# 	frappe.delete_doc("Audit Log", log, force=True)
+		for log in logs:
+			frappe.delete_doc("Audit Log", log, force=True)
 
 		jobs = frappe.get_all(
 		"Job Card",
@@ -181,8 +285,14 @@ class TestJobCard(FrappeTestCase):
 
 		for job in jobs:
 			doc = frappe.get_doc("Job Card", job)
-			doc.status = "Draft"
-			doc.save(ignore_permissions=True)
+			if doc.docstatus==0:
+				doc.status = "Draft"
+				doc.save(ignore_permissions=True)
+			
+			if doc.docstatus==1:
+				doc.status="Draft"
+				doc.save(ignore_permissions=True)
+				doc.cancel()
 			frappe.delete_doc("Job Card", job, force=True)
 
 

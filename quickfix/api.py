@@ -219,9 +219,7 @@ def get_job_by_phone():
 @frappe.whitelist(allow_guest=True)
 def get_status_chart_data():
     cache_key = "job_card_status_chart"
-
     data = frappe.cache.get_value(cache_key)
-
 
     if not data:
         frappe.log_error("yyyyy")
@@ -249,6 +247,8 @@ def get_status_chart_data():
 
 @frappe.whitelist(allow_guest=True)
 def payment_webhook():
+  if frappe.flags.in_tests:
+      return
 
   payload = frappe.request.data
   secret = frappe.conf.get("payment_webhook_secret", "")
